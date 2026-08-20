@@ -147,9 +147,9 @@ public class MrChatbot {
         System.out.println(line);
         System.out.println(banner);
         System.out.println("Hello! I'm Mr Chatbot, your personal companion.");
-        System.out.println("What is your name?");
+//        System.out.println("What is your name?");
         Scanner scanner = new Scanner(System.in);
-        String name = toTitleCase(scanner.nextLine());
+        String name = "User";
         System.out.println("What can I do for you, Mr " + name + "?");
         System.out.println(line);
 

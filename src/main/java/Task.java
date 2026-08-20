@@ -16,7 +16,7 @@ public class Task {
     /**
      * Returns X if the task is done, or a blank space otherwise.
      */
-    private String getStatusIcon() {
+    public String getStatusIcon() {
         return isDone ? "X" : " ";
     }
 

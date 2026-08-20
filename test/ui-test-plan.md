@@ -26,6 +26,8 @@ Event behavior is split across these cases:
 General command behavior:
 
 - `todo` with no description is rejected with a description-specific error.
+- `delete <task number>` removes the matching task from the list.
+- `delete` without a task number is rejected.
 - Unknown commands ask the user to type `help`.
 - `help` lists all accepted inputs and their formats.
 
@@ -547,7 +549,58 @@ Bye Mr User. Hope to see you again soon!
 ____________________________________________________________
 ```
 
-### TC-017 Unknown Command
+### TC-017 Delete Command
+
+Aim: Verify that `delete <task number>` removes the matching task and shifts the remaining tasks.
+
+Inputs:
+
+```text
+todo read book
+todo return book
+delete 1
+list
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+                       _           _   _           _   
+ _ __ ___  _ __    ___| |__   __ _| |_| |__   ___ | |_ 
+| '_ ` _ \| '__|  / __| '_ \ / _` | __| '_ \ / _ \| __|
+| | | | | | |    | (__| | | | (_| | |_| |_) | (_) | |_ 
+|_| |_| |_|_|     \___|_| |_|\__,_|\__|_.__/ \___/ \__|
+
+Hello! I'm Mr Chatbot, your personal companion.
+What can I do for you, Mr User?
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] return book
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] return book
+____________________________________________________________
+____________________________________________________________
+Bye Mr User. Hope to see you again soon!
+____________________________________________________________
+```
+
+### TC-018 Unknown Command
 
 Aim: Verify that a command that does not match any accepted input asks the user to type `help`.
 
@@ -579,7 +632,7 @@ Bye Mr User. Hope to see you again soon!
 ____________________________________________________________
 ```
 
-### TC-018 Help Command
+### TC-019 Help Command
 
 Aim: Verify that `help` lists all accepted inputs and their formats.
 
@@ -611,6 +664,7 @@ event <description> /from <start> /to <end>
 list
 mark <task number>
 unmark <task number>
+delete <task number>
 bye
 help
 ____________________________________________________________
@@ -619,7 +673,39 @@ Bye Mr User. Hope to see you again soon!
 ____________________________________________________________
 ```
 
-### TC-019 Mark Command Without Task Number
+### TC-020 Delete Command Without Task Number
+
+Aim: Verify that `delete` without a task number is rejected.
+
+Inputs:
+
+```text
+delete
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+                       _           _   _           _   
+ _ __ ___  _ __    ___| |__   __ _| |_| |__   ___ | |_ 
+| '_ ` _ \| '__|  / __| '_ \ / _` | __| '_ \ / _ \| __|
+| | | | | | |    | (__| | | | (_| | |_| |_) | (_) | |_ 
+|_| |_| |_|_|     \___|_| |_|\__,_|\__|_.__/ \___/ \__|
+
+Hello! I'm Mr Chatbot, your personal companion.
+What can I do for you, Mr User?
+____________________________________________________________
+____________________________________________________________
+Sorry, I don't understand that task format.
+____________________________________________________________
+____________________________________________________________
+Bye Mr User. Hope to see you again soon!
+____________________________________________________________
+```
+
+### TC-021 Mark Command Without Task Number
 
 Aim: Verify that `mark` without a task number is rejected.
 
@@ -651,7 +737,7 @@ Bye Mr User. Hope to see you again soon!
 ____________________________________________________________
 ```
 
-### TC-020 Unmark Command Without Task Number
+### TC-022 Unmark Command Without Task Number
 
 Aim: Verify that `unmark` without a task number is rejected.
 

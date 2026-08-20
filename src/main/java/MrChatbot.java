@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MrChatbot {
@@ -53,7 +54,7 @@ public class MrChatbot {
             throw new MrChatbotException(eventMissingMessage(true, true, true));
         }
 
-        if (lowerCaseInput.equals("mark") || lowerCaseInput.equals("unmark")) {
+        if (lowerCaseInput.equals("mark") || lowerCaseInput.equals("unmark") || lowerCaseInput.equals("delete")) {
             throw new MrChatbotException(INVALID_TASK_FORMAT_MESSAGE);
         }
 
@@ -202,6 +203,7 @@ public class MrChatbot {
         System.out.println("list");
         System.out.println("mark <task number>");
         System.out.println("unmark <task number>");
+        System.out.println("delete <task number>");
         System.out.println("bye");
         System.out.println("help");
     }
@@ -244,9 +246,8 @@ public class MrChatbot {
         System.out.println("What can I do for you, Mr " + name + "?");
         System.out.println(line);
 
-        // Store tasks in a fixed-size array.
-        Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        // Store tasks in an ArrayList so tasks can be added and deleted easily.
+        ArrayList<Task> tasks = new ArrayList<>();
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine();
             String lowerCaseInput = input.toLowerCase();
@@ -262,37 +263,45 @@ public class MrChatbot {
                     printHelp();
                 } else if (input.equalsIgnoreCase("list")) {
                     System.out.println("Here are the tasks in your list:");
-                    for (int i = 0; i < taskCount; i++) {
-                        System.out.println((i + 1) + "." + tasks[i]);
+                    for (int i = 0; i < tasks.size(); i++) {
+                        System.out.println((i + 1) + "." + tasks.get(i));
                     }
                 } else if (lowerCaseInput.startsWith("mark ")) {
                     int taskNumber = parseTaskNumber(input.substring(5));
-                    if (taskNumber < 1 || taskNumber > taskCount) {
+                    if (taskNumber < 1 || taskNumber > tasks.size()) {
                         throw new MrChatbotException("This task doesn't exist...");
                     }
-                    Task task = tasks[taskNumber - 1];
+                    Task task = tasks.get(taskNumber - 1);
                     task.markAsDone();
                     System.out.println("Nice! I've marked this task as done:");
                     System.out.println("  " + task);
                 } else if (lowerCaseInput.startsWith("unmark ")) {
                     int taskNumber = parseTaskNumber(input.substring(7));
-                    if (taskNumber < 1 || taskNumber > taskCount) {
+                    if (taskNumber < 1 || taskNumber > tasks.size()) {
                         throw new MrChatbotException("This task doesn't exist...");
                     }
-                    Task task = tasks[taskNumber - 1];
+                    Task task = tasks.get(taskNumber - 1);
                     task.markAsNotDone();
                     System.out.println("OK, I've marked this task as not done yet:");
                     System.out.println("  " + task);
-                } else if (taskCount == MAX_TASKS) {
+                } else if (lowerCaseInput.startsWith("delete ")) {
+                    int taskNumber = parseTaskNumber(input.substring(7));
+                    if (taskNumber < 1 || taskNumber > tasks.size()) {
+                        throw new MrChatbotException("This task doesn't exist...");
+                    }
+                    Task task = tasks.remove(taskNumber - 1);
+                    System.out.println("Noted. I've removed this task:");
+                    System.out.println("  " + task);
+                    System.out.println("Now you have " + tasks.size() + " " + taskWord(tasks.size()) + " in the list.");
+                } else if (tasks.size() == MAX_TASKS) {
                     throw new MrChatbotException(
                             "Sorry, Mr " + name + ", your task list is full. No more tasks can be added.");
                 } else {
                     Task task = createTask(input);
-                    tasks[taskCount] = task;
-                    taskCount++;
+                    tasks.add(task);
                     System.out.println("Got it. I've added this task:");
                     System.out.println("  " + task);
-                    System.out.println("Now you have " + taskCount + " " + taskWord(taskCount) + " in the list.");
+                    System.out.println("Now you have " + tasks.size() + " " + taskWord(tasks.size()) + " in the list.");
                 }
             } catch (MrChatbotException e) {
                 System.out.println(e.getMessage());

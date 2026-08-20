@@ -38,26 +38,48 @@ public class MrChatbot {
         System.out.println("What can I do for you, Mr " + name + "?");
         System.out.println(line);
 
-        // Store tasks in a fixed-size array
-        String[] tasks = new String[MAX_TASKS];
+        // Store tasks in a fixed-size array.
+        Task[] tasks = new Task[MAX_TASKS];
         int taskCount = 0;
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine();
+            String lowerCaseInput = input.toLowerCase();
             System.out.println(line);
             if (input.equalsIgnoreCase("bye")) {
-                System.out.println("Bye Mr " + name + ", hope to see you again soon!");
+                System.out.println("Bye Mr " + name + ". Hope to see you again soon!");
                 System.out.println(line);
                 break;
             }
 
             if (input.equalsIgnoreCase("list")) {
+                System.out.println("Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
-                    System.out.println((i + 1) + ". " + tasks[i]);
+                    System.out.println((i + 1) + "." + tasks[i]);
                 }
+            } else if (lowerCaseInput.startsWith("mark ")) {
+                int taskNumber = Integer.parseInt(input.substring(5));
+                if (taskNumber < 1 || taskNumber > taskCount) {
+                    System.out.println("This task doesn't exist...");
+                    continue;
+                }
+                Task task = tasks[taskNumber - 1];
+                task.markAsDone();
+                System.out.println("Nice! I've marked this task as done:");
+                System.out.println("  " + task);
+            } else if (lowerCaseInput.startsWith("unmark ")) {
+                int taskNumber = Integer.parseInt(input.substring(7));
+                if (taskNumber < 1 || taskNumber > taskCount) {
+                    System.out.println("This task doesn't exist...");
+                    continue;
+                }
+                Task task = tasks[taskNumber - 1];
+                task.markAsNotDone();
+                System.out.println("OK, I've marked this task as not done yet:");
+                System.out.println("  " + task);
             } else if (taskCount == MAX_TASKS) {
                 System.out.println("Sorry, Mr " + name + ", your task list is full. No more tasks can be added.");
             } else {
-                tasks[taskCount] = input;
+                tasks[taskCount] = new Task(input);
                 taskCount++;
                 System.out.println("added: " + input);
             }

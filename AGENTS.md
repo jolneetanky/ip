@@ -20,6 +20,7 @@ Unless the user says otherwise, assume that you are assisting a student working 
   * When suggesting a Git command, briefly explain what it does.
   * Add explanatory Javadoc comments to all classes and to nontrivial methods and fields when their purpose or behavior is not obvious.
   * Make generated code as self-explanatory as possible, and include explanatory comments where they improve understanding.
+  * When making code changes, preserve existing comments made by the user. Modify or remove existing comments only when necessary, such as when the code changes make the comment inaccurate; in that case, update the comment to match the implementation details.
   * When faced with a design choice, choose the simplest option that is sufficient for the requirements, while briefly explaining relevant more advanced alternatives.
 
 # Project-specific requirements

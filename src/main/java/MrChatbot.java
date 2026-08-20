@@ -3,9 +3,6 @@ import java.util.Scanner;
 
 public class MrChatbot {
     private static final int MAX_TASKS = 100;
-    private static final String TODO_COMMAND = "todo ";
-    private static final String DEADLINE_COMMAND = "deadline ";
-    private static final String EVENT_COMMAND = "event ";
     private static final String INVALID_TASK_FORMAT_MESSAGE = "Sorry, I don't understand that task format.";
     private static final String UNKNOWN_COMMAND_MESSAGE = "Sorry, I don't understand that command. Please type \"help\".";
     private static final String TODO_FORMAT_MESSAGE = "Todo description cannot be empty. Please use the format: todo <description>";
@@ -17,6 +14,50 @@ public class MrChatbot {
     private static final String DEADLINE_DESCRIPTION_AND_BY_MISSING_MESSAGE =
             "Deadline description and /by cannot be empty. " + DEADLINE_FORMAT_MESSAGE;
     private static final String EVENT_FORMAT_MESSAGE = "Please use the format: event <description> /from <start> /to <end>";
+
+    /**
+     * Represents the command words accepted by the chatbot.
+     */
+    private enum CommandType {
+        TODO("todo"),
+        DEADLINE("deadline"),
+        EVENT("event"),
+        LIST("list"),
+        MARK("mark"),
+        UNMARK("unmark"),
+        DELETE("delete"),
+        BYE("bye"),
+        HELP("help"),
+        UNKNOWN("");
+
+        private final String word;
+
+        CommandType(String word) {
+            this.word = word;
+        }
+
+        private boolean matches(String lowerCaseInput) {
+            return lowerCaseInput.equals(word) || lowerCaseInput.startsWith(word + " ");
+        }
+
+        private boolean matchesExactly(String lowerCaseInput) {
+            return lowerCaseInput.equals(word);
+        }
+
+        private String withTrailingSpace() {
+            return word + " ";
+        }
+
+        private static CommandType from(String input) {
+            String lowerCaseInput = input.toLowerCase();
+            for (CommandType commandType : values()) {
+                if (commandType != UNKNOWN && commandType.matches(lowerCaseInput)) {
+                    return commandType;
+                }
+            }
+            return UNKNOWN;
+        }
+    }
 
     /**
      * Converts a name to title case, where the first letter of each word is capitalized.
@@ -41,44 +82,45 @@ public class MrChatbot {
      */
     private static Task createTask(String input) throws MrChatbotException {
         String lowerCaseInput = input.toLowerCase();
+        CommandType commandType = CommandType.from(input);
 
-        if (lowerCaseInput.equals("todo")) {
+        if (lowerCaseInput.equals(CommandType.TODO.word)) {
             throw new MrChatbotException(TODO_FORMAT_MESSAGE);
         }
 
-        if (lowerCaseInput.equals("deadline")) {
+        if (lowerCaseInput.equals(CommandType.DEADLINE.word)) {
             throw new MrChatbotException(DEADLINE_DESCRIPTION_AND_BY_MISSING_MESSAGE);
         }
 
-        if (lowerCaseInput.equals("event")) {
+        if (lowerCaseInput.equals(CommandType.EVENT.word)) {
             throw new MrChatbotException(eventMissingMessage(true, true, true));
         }
 
-        if (lowerCaseInput.equals("mark") || lowerCaseInput.equals("unmark") || lowerCaseInput.equals("delete")) {
+        if (commandType == CommandType.MARK || commandType == CommandType.UNMARK || commandType == CommandType.DELETE) {
             throw new MrChatbotException(INVALID_TASK_FORMAT_MESSAGE);
         }
 
-        if (lowerCaseInput.startsWith(TODO_COMMAND)) {
-            String description = input.substring(TODO_COMMAND.length());
+        if (commandType == CommandType.TODO) {
+            String description = input.substring(CommandType.TODO.withTrailingSpace().length());
             if (description.isBlank()) {
                 throw new MrChatbotException(TODO_FORMAT_MESSAGE);
             }
             return new Todo(description);
         }
 
-        if (lowerCaseInput.startsWith(DEADLINE_COMMAND)) {
+        if (commandType == CommandType.DEADLINE) {
             int byIndex = lowerCaseInput.indexOf(" /by ");
             if (byIndex == -1) {
-                String description = input.substring(DEADLINE_COMMAND.length());
+                String description = input.substring(CommandType.DEADLINE.withTrailingSpace().length());
                 if (description.isBlank()) {
                     throw new MrChatbotException(DEADLINE_DESCRIPTION_AND_BY_MISSING_MESSAGE);
                 }
                 throw new MrChatbotException(DEADLINE_BY_MISSING_MESSAGE);
             }
-            if (byIndex <= DEADLINE_COMMAND.length()) {
+            if (byIndex <= CommandType.DEADLINE.withTrailingSpace().length()) {
                 throw new MrChatbotException(DEADLINE_DESCRIPTION_MISSING_MESSAGE);
             }
-            String description = input.substring(DEADLINE_COMMAND.length(), byIndex);
+            String description = input.substring(CommandType.DEADLINE.withTrailingSpace().length(), byIndex);
             String by = input.substring(byIndex + " /by ".length());
             if (description.isBlank() && by.isBlank()) {
                 throw new MrChatbotException(DEADLINE_DESCRIPTION_AND_BY_MISSING_MESSAGE);
@@ -92,7 +134,7 @@ public class MrChatbot {
             return new Deadline(description, by);
         }
 
-        if (lowerCaseInput.startsWith(EVENT_COMMAND)) {
+        if (commandType == CommandType.EVENT) {
             int fromIndex = lowerCaseInput.indexOf(" /from ");
             int toIndex = lowerCaseInput.indexOf(" /to ");
             String description = eventDescription(input, fromIndex, toIndex);
@@ -128,21 +170,21 @@ public class MrChatbot {
     private static String eventDescription(String input, int fromIndex, int toIndex) {
         // CASE 1: if fromIndex comes first, check if there's description between COMMAND and fromIndex
         if (fromIndex != -1 && (toIndex == -1 || fromIndex < toIndex)) {
-            if (fromIndex <= EVENT_COMMAND.length()) {
+            if (fromIndex <= CommandType.EVENT.withTrailingSpace().length()) {
                 return "";
             }
-            return input.substring(EVENT_COMMAND.length(), fromIndex);
+            return input.substring(CommandType.EVENT.withTrailingSpace().length(), fromIndex);
         }
 
         // CASE 2: if toIndex comes first, check if there's description between COMMAND and toIndex
         if (toIndex != -1) {
-            if (toIndex <= EVENT_COMMAND.length()) {
+            if (toIndex <= CommandType.EVENT.withTrailingSpace().length()) {
                 return "";
             }
-            return input.substring(EVENT_COMMAND.length(), toIndex);
+            return input.substring(CommandType.EVENT.withTrailingSpace().length(), toIndex);
         }
 
-        return input.substring(EVENT_COMMAND.length());
+        return input.substring(CommandType.EVENT.withTrailingSpace().length());
     }
 
     /**
@@ -252,22 +294,22 @@ public class MrChatbot {
             String input = scanner.nextLine();
             String lowerCaseInput = input.toLowerCase();
             System.out.println(line);
-            if (input.equalsIgnoreCase("bye")) {
+            if (CommandType.BYE.matchesExactly(lowerCaseInput)) {
                 System.out.println("Bye Mr " + name + ". Hope to see you again soon!");
                 System.out.println(line);
                 break;
             }
 
             try {
-                if (input.equalsIgnoreCase("help")) {
+                if (CommandType.HELP.matchesExactly(lowerCaseInput)) {
                     printHelp();
-                } else if (input.equalsIgnoreCase("list")) {
+                } else if (CommandType.LIST.matchesExactly(lowerCaseInput)) {
                     System.out.println("Here are the tasks in your list:");
                     for (int i = 0; i < tasks.size(); i++) {
                         System.out.println((i + 1) + "." + tasks.get(i));
                     }
-                } else if (lowerCaseInput.startsWith("mark ")) {
-                    int taskNumber = parseTaskNumber(input.substring(5));
+                } else if (lowerCaseInput.startsWith(CommandType.MARK.withTrailingSpace())) {
+                    int taskNumber = parseTaskNumber(input.substring(CommandType.MARK.withTrailingSpace().length()));
                     if (taskNumber < 1 || taskNumber > tasks.size()) {
                         throw new MrChatbotException("This task doesn't exist...");
                     }
@@ -275,8 +317,8 @@ public class MrChatbot {
                     task.markAsDone();
                     System.out.println("Nice! I've marked this task as done:");
                     System.out.println("  " + task);
-                } else if (lowerCaseInput.startsWith("unmark ")) {
-                    int taskNumber = parseTaskNumber(input.substring(7));
+                } else if (lowerCaseInput.startsWith(CommandType.UNMARK.withTrailingSpace())) {
+                    int taskNumber = parseTaskNumber(input.substring(CommandType.UNMARK.withTrailingSpace().length()));
                     if (taskNumber < 1 || taskNumber > tasks.size()) {
                         throw new MrChatbotException("This task doesn't exist...");
                     }
@@ -284,8 +326,8 @@ public class MrChatbot {
                     task.markAsNotDone();
                     System.out.println("OK, I've marked this task as not done yet:");
                     System.out.println("  " + task);
-                } else if (lowerCaseInput.startsWith("delete ")) {
-                    int taskNumber = parseTaskNumber(input.substring(7));
+                } else if (lowerCaseInput.startsWith(CommandType.DELETE.withTrailingSpace())) {
+                    int taskNumber = parseTaskNumber(input.substring(CommandType.DELETE.withTrailingSpace().length()));
                     if (taskNumber < 1 || taskNumber > tasks.size()) {
                         throw new MrChatbotException("This task doesn't exist...");
                     }

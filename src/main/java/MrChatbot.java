@@ -1,6 +1,26 @@
 import java.util.Scanner;
 
 public class MrChatbot {
+    private static final int MAX_TASKS = 100;
+
+    /**
+     * Converts a name to title case, where the first letter of each word is capitalized.
+     */
+    private static String toTitleCase(String name) {
+        if (name.trim().isEmpty()) {
+            return "";
+        }
+        String[] words = name.trim().toLowerCase().split("\\s+");
+        String titleCaseName = "";
+        for (String word : words) {
+            if (!titleCaseName.isEmpty()) {
+                titleCaseName += " ";
+            }
+            titleCaseName += word.substring(0, 1).toUpperCase() + word.substring(1);
+        }
+        return titleCaseName;
+    }
+
     public static void main(String[] args) {
         String line = "____________________________________________________________";
         String banner = "                       _           _   _           _   \n"
@@ -12,20 +32,35 @@ public class MrChatbot {
         System.out.println(line);
         System.out.println(banner);
         System.out.println("Hello! I'm Mr Chatbot, your personal companion.");
-        System.out.println("What can I do for you?");
+        System.out.println("What is your name?");
+        Scanner scanner = new Scanner(System.in);
+        String name = toTitleCase(scanner.nextLine());
+        System.out.println("What can I do for you, Mr " + name + "?");
         System.out.println(line);
 
-        // Read user inputs in a loop until they say "bye"
-        Scanner scanner = new Scanner(System.in);
+        // Store tasks in a fixed-size array
+        String[] tasks = new String[MAX_TASKS];
+        int taskCount = 0;
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine();
             System.out.println(line);
             if (input.equalsIgnoreCase("bye")) {
-                System.out.println("Bye. Hope to see you again soon!");
+                System.out.println("Bye Mr " + name + ", hope to see you again soon!");
                 System.out.println(line);
                 break;
             }
-            System.out.println(input);
+
+            if (input.equalsIgnoreCase("list")) {
+                for (int i = 0; i < taskCount; i++) {
+                    System.out.println((i + 1) + ". " + tasks[i]);
+                }
+            } else if (taskCount == MAX_TASKS) {
+                System.out.println("Sorry, Mr " + name + ", your task list is full. No more tasks can be added.");
+            } else {
+                tasks[taskCount] = input;
+                taskCount++;
+                System.out.println("added: " + input);
+            }
             System.out.println(line);
         }
     }

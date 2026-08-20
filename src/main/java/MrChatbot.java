@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class MrChatbot {
     public static void main(String[] args) {
         String line = "____________________________________________________________";
@@ -12,7 +14,19 @@ public class MrChatbot {
         System.out.println("Hello! I'm Mr Chatbot, your personal companion.");
         System.out.println("What can I do for you?");
         System.out.println(line);
-        System.out.println("Bye. Hope to see you again soon!");
-        System.out.println(line);
+
+        // Read user inputs in a loop until they say "bye"
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String input = scanner.nextLine();
+            System.out.println(line);
+            if (input.equalsIgnoreCase("bye")) {
+                System.out.println("Bye. Hope to see you again soon!");
+                System.out.println(line);
+                break;
+            }
+            System.out.println(input);
+            System.out.println(line);
+        }
     }
 }

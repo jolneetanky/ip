@@ -5,23 +5,23 @@ These tests run the chatbot as a console program.
 Deadline behavior is split across these cases:
 
 - `deadline` with no description and no `/by` is rejected with a message naming both missing parts.
-- `deadline /by <deadline>` with no description is rejected with a description-specific message.
+- `deadline /by <yyyy-mm-dd>` with no description is rejected with a description-specific message.
 - `deadline <description>` without `/by` is rejected with a `/by`-specific message.
 - `deadline <description> /by` with no deadline is rejected with a `/by`-specific message.
-- `deadline <description> /by <deadline>` creates a deadline task.
+- `deadline <description> /by <yyyy-mm-dd>` creates a deadline task.
 
 Event behavior is split across these cases:
 
 - `event` with no description, `/from`, and `/to` is rejected with a message naming all three missing parts.
-- `event /from <start> /to <end>` with no description is rejected with a description-specific message.
-- `event <description> /to <end>` without `/from` is rejected with a `/from`-specific message.
-- `event <description> /from <start>` without `/to` is rejected with a `/to`-specific message.
+- `event /from <yyyy-mm-dd> /to <yyyy-mm-dd>` with no description is rejected with a description-specific message.
+- `event <description> /to <yyyy-mm-dd>` without `/from` is rejected with a `/from`-specific message.
+- `event <description> /from <yyyy-mm-dd>` without `/to` is rejected with a `/to`-specific message.
 - `event <description>` without `/from` and `/to` is rejected with a message naming both missing parts.
-- `event /to <end>` without description and `/from` is rejected with a message naming both missing parts.
-- `event /from <start>` without description and `/to` is rejected with a message naming both missing parts.
-- `event /from /to <end>` without description and a `/from` value is rejected with a message naming both missing parts.
-- `event <description> /from <start> /to <end>` creates an event task.
-- `event <description> /to <end> /from <start>` creates an event task even when `/to` comes before `/from`.
+- `event /to <yyyy-mm-dd>` without description and `/from` is rejected with a message naming both missing parts.
+- `event /from <yyyy-mm-dd>` without description and `/to` is rejected with a message naming both missing parts.
+- `event /from /to <yyyy-mm-dd>` without description and a `/from` value is rejected with a message naming both missing parts.
+- `event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>` creates an event task.
+- `event <description> /to <yyyy-mm-dd> /from <yyyy-mm-dd>` creates an event task even when `/to` comes before `/from`.
 
 General command behavior:
 
@@ -92,7 +92,7 @@ Hello! I'm Mr Chatbot, your personal companion.
 What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
-Deadline description and /by cannot be empty. Please use the format: deadline <description> /by <deadline>
+Deadline description and /by cannot be empty. Please use the format: deadline <description> /by <yyyy-mm-dd>
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
@@ -124,7 +124,7 @@ Hello! I'm Mr Chatbot, your personal companion.
 What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
-Event description, /from, and /to cannot be empty. Please use the format: event <description> /from <start> /to <end>
+Event description, /from, and /to cannot be empty. Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
@@ -133,7 +133,7 @@ ____________________________________________________________
 
 ### TC-004 Deadline Command With By But Without Description
 
-Aim: Verify that `deadline /by <deadline>` without a task description is rejected with a description-specific message.
+Aim: Verify that `deadline /by <yyyy-mm-dd>` without a task description is rejected with a description-specific message.
 
 Inputs:
 
@@ -156,7 +156,7 @@ Hello! I'm Mr Chatbot, your personal companion.
 What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
-Deadline description cannot be empty. Please use the format: deadline <description> /by <deadline>
+Deadline description cannot be empty. Please use the format: deadline <description> /by <yyyy-mm-dd>
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
@@ -188,7 +188,7 @@ Hello! I'm Mr Chatbot, your personal companion.
 What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
-Deadline /by cannot be empty. Please use the format: deadline <description> /by <deadline>
+Deadline /by cannot be empty. Please use the format: deadline <description> /by <yyyy-mm-dd>
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
@@ -220,7 +220,7 @@ Hello! I'm Mr Chatbot, your personal companion.
 What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
-Deadline /by cannot be empty. Please use the format: deadline <description> /by <deadline>
+Deadline /by cannot be empty. Please use the format: deadline <description> /by <yyyy-mm-dd>
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
@@ -229,7 +229,73 @@ ____________________________________________________________
 
 ### TC-007 Deadline Command With Description And By Argument
 
-Aim: Verify that `deadline <description> /by <deadline>` creates a deadline task.
+Aim: Verify that `deadline <description> /by <yyyy-mm-dd>` creates a deadline task.
+
+Inputs:
+
+```text
+deadline return book /by 2019-12-01
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+                       _           _   _           _   
+ _ __ ___  _ __    ___| |__   __ _| |_| |__   ___ | |_ 
+| '_ ` _ \| '__|  / __| '_ \ / _` | __| '_ \ / _ \| __|
+| | | | | | |    | (__| | | | (_| | |_| |_) | (_) | |_ 
+|_| |_| |_|_|     \___|_| |_|\__,_|\__|_.__/ \___/ \__|
+
+Hello! I'm Mr Chatbot, your personal companion.
+What can I do for you, Mr User?
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] return book (by: Dec 1 2019)
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Bye Mr User. Hope to see you again soon!
+____________________________________________________________
+```
+
+### TC-008 Event Command With From And To But Without Description
+
+Aim: Verify that `event /from <yyyy-mm-dd> /to <yyyy-mm-dd>` without a description is rejected with a description-specific message.
+
+Inputs:
+
+```text
+event /from 2019-12-01 /to 2019-12-02
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+                       _           _   _           _   
+ _ __ ___  _ __    ___| |__   __ _| |_| |__   ___ | |_ 
+| '_ ` _ \| '__|  / __| '_ \ / _` | __| '_ \ / _ \| __|
+| | | | | | |    | (__| | | | (_| | |_| |_) | (_) | |_ 
+|_| |_| |_|_|     \___|_| |_|\__,_|\__|_.__/ \___/ \__|
+
+Hello! I'm Mr Chatbot, your personal companion.
+What can I do for you, Mr User?
+____________________________________________________________
+____________________________________________________________
+Event description cannot be empty. Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>
+____________________________________________________________
+____________________________________________________________
+Bye Mr User. Hope to see you again soon!
+____________________________________________________________
+```
+
+### TC-008A Deadline Command With Invalid Date
+
+Aim: Verify that `deadline <description> /by <yyyy-mm-dd>` rejects dates that are not in yyyy-mm-dd format.
 
 Inputs:
 
@@ -252,41 +318,7 @@ Hello! I'm Mr Chatbot, your personal companion.
 What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
-  [D][ ] return book (by: Sunday)
-Now you have 1 task in the list.
-____________________________________________________________
-____________________________________________________________
-Bye Mr User. Hope to see you again soon!
-____________________________________________________________
-```
-
-### TC-008 Event Command With From And To But Without Description
-
-Aim: Verify that `event /from <start> /to <end>` without a description is rejected with a description-specific message.
-
-Inputs:
-
-```text
-event /from Mon 2pm /to 4pm
-bye
-```
-
-Expected output:
-
-```text
-____________________________________________________________
-                       _           _   _           _   
- _ __ ___  _ __    ___| |__   __ _| |_| |__   ___ | |_ 
-| '_ ` _ \| '__|  / __| '_ \ / _` | __| '_ \ / _ \| __|
-| | | | | | |    | (__| | | | (_| | |_| |_) | (_) | |_ 
-|_| |_| |_|_|     \___|_| |_|\__,_|\__|_.__/ \___/ \__|
-
-Hello! I'm Mr Chatbot, your personal companion.
-What can I do for you, Mr User?
-____________________________________________________________
-____________________________________________________________
-Event description cannot be empty. Please use the format: event <description> /from <start> /to <end>
+Deadline date must be in yyyy-mm-dd format. Please use the format: deadline <description> /by <yyyy-mm-dd>
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
@@ -295,12 +327,12 @@ ____________________________________________________________
 
 ### TC-009 Event Command Without From Argument
 
-Aim: Verify that `event <description> /to <end>` without `/from` is rejected with a `/from`-specific message.
+Aim: Verify that `event <description> /to <yyyy-mm-dd>` without `/from` is rejected with a `/from`-specific message.
 
 Inputs:
 
 ```text
-event meeting /to 4pm
+event meeting /to 2019-12-02
 bye
 ```
 
@@ -318,7 +350,7 @@ Hello! I'm Mr Chatbot, your personal companion.
 What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
-Event /from cannot be empty. Please use the format: event <description> /from <start> /to <end>
+Event /from cannot be empty. Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
@@ -327,12 +359,12 @@ ____________________________________________________________
 
 ### TC-010 Event Command Without To Argument
 
-Aim: Verify that `event <description> /from <start>` without `/to` is rejected with a `/to`-specific message.
+Aim: Verify that `event <description> /from <yyyy-mm-dd>` without `/to` is rejected with a `/to`-specific message.
 
 Inputs:
 
 ```text
-event meeting /from Mon 2pm
+event meeting /from 2019-12-01
 bye
 ```
 
@@ -350,7 +382,7 @@ Hello! I'm Mr Chatbot, your personal companion.
 What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
-Event /to cannot be empty. Please use the format: event <description> /from <start> /to <end>
+Event /to cannot be empty. Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
@@ -382,7 +414,7 @@ Hello! I'm Mr Chatbot, your personal companion.
 What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
-Event /from and /to cannot be empty. Please use the format: event <description> /from <start> /to <end>
+Event /from and /to cannot be empty. Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
@@ -391,12 +423,12 @@ ____________________________________________________________
 
 ### TC-012 Event Command With To But Without Description And From
 
-Aim: Verify that `event /to <end>` without description and `/from` is rejected with a message naming both missing parts.
+Aim: Verify that `event /to <yyyy-mm-dd>` without description and `/from` is rejected with a message naming both missing parts.
 
 Inputs:
 
 ```text
-event /to 4pm
+event /to 2019-12-02
 bye
 ```
 
@@ -414,7 +446,7 @@ Hello! I'm Mr Chatbot, your personal companion.
 What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
-Event description and /from cannot be empty. Please use the format: event <description> /from <start> /to <end>
+Event description and /from cannot be empty. Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
@@ -423,12 +455,12 @@ ____________________________________________________________
 
 ### TC-013 Event Command With From But Without Description And To
 
-Aim: Verify that `event /from <start>` without description and `/to` is rejected with a message naming both missing parts.
+Aim: Verify that `event /from <yyyy-mm-dd>` without description and `/to` is rejected with a message naming both missing parts.
 
 Inputs:
 
 ```text
-event /from Mon 2pm
+event /from 2019-12-01
 bye
 ```
 
@@ -446,7 +478,7 @@ Hello! I'm Mr Chatbot, your personal companion.
 What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
-Event description and /to cannot be empty. Please use the format: event <description> /from <start> /to <end>
+Event description and /to cannot be empty. Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
@@ -455,7 +487,7 @@ ____________________________________________________________
 
 ### TC-014 Event Command With Blank From And To Argument
 
-Aim: Verify that `event /from /to <end>` without description and a `/from` value is rejected with a message naming both missing parts.
+Aim: Verify that `event /from /to <yyyy-mm-dd>` without description and a `/from` value is rejected with a message naming both missing parts.
 
 Inputs:
 
@@ -478,7 +510,7 @@ Hello! I'm Mr Chatbot, your personal companion.
 What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
-Event description and /from cannot be empty. Please use the format: event <description> /from <start> /to <end>
+Event description and /from cannot be empty. Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
@@ -487,12 +519,12 @@ ____________________________________________________________
 
 ### TC-015 Event Command With Description, From, And To Arguments
 
-Aim: Verify that `event <description> /from <start> /to <end>` creates an event task and saves it to disk.
+Aim: Verify that `event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>` creates an event task and saves it to disk.
 
 Inputs:
 
 ```text
-event meeting /from Mon 2pm /to 4pm
+event meeting /from 2019-12-01 /to 2019-12-02
 bye
 ```
 
@@ -511,7 +543,7 @@ What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [E][ ] meeting (from: Mon 2pm to: 4pm)
+  [E][ ] meeting (from: Dec 1 2019 to: Dec 2 2019)
 Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -522,17 +554,17 @@ ____________________________________________________________
 Expected storage:
 
 ```text
-E | 0 | meeting | Mon 2pm | 4pm
+E | 0 | meeting | 2019-12-01 | 2019-12-02
 ```
 
 ### TC-016 Event Command With Description, To, And From Arguments
 
-Aim: Verify that `event <description> /to <end> /from <start>` creates an event task when `/to` comes before `/from`.
+Aim: Verify that `event <description> /to <yyyy-mm-dd> /from <yyyy-mm-dd>` creates an event task when `/to` comes before `/from`.
 
 Inputs:
 
 ```text
-event meeting /to 4pm /from Mon 2pm
+event meeting /to 2019-12-02 /from 2019-12-01
 bye
 ```
 
@@ -551,7 +583,7 @@ What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [E][ ] meeting (from: Mon 2pm to: 4pm)
+  [E][ ] meeting (from: Dec 1 2019 to: Dec 2 2019)
 Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -675,8 +707,8 @@ ____________________________________________________________
 ____________________________________________________________
 Accepted inputs:
 todo <description>
-deadline <description> /by <deadline>
-event <description> /from <start> /to <end>
+deadline <description> /by <yyyy-mm-dd>
+event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>
 list
 mark <task number>
 unmark <task number>
@@ -793,8 +825,8 @@ Initial storage:
 
 ```text
 T | 1 | read book
-D | 0 | return book | Sunday
-E | 0 | meeting | Mon 2pm | 4pm
+D | 0 | return book | 2019-12-01
+E | 0 | meeting | 2019-12-01 | 2019-12-02
 ```
 
 Inputs:
@@ -820,8 +852,8 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][X] read book
-2.[D][ ] return book (by: Sunday)
-3.[E][ ] meeting (from: Mon 2pm to: 4pm)
+2.[D][ ] return book (by: Dec 1 2019)
+3.[E][ ] meeting (from: Dec 1 2019 to: Dec 2 2019)
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!

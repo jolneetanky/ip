@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.Test;
 
 import mrchatbot.exception.MrChatbotException;
@@ -99,5 +102,44 @@ public class TaskListTest {
 
         MrChatbotException exception = assertThrows(MrChatbotException.class, () -> tasks.delete(2));
         assertEquals("This task doesn't exist...", exception.getMessage());
+    }
+
+    @Test
+    public void find_matchingKeyword_matchingTasksReturned() {
+        TaskList tasks = new TaskList();
+        Todo todo = new Todo("read book");
+        Deadline deadline = new Deadline("return book", LocalDate.parse("2019-12-01"));
+        Event event = new Event("project meeting", LocalDate.parse("2019-12-01"), LocalDate.parse("2019-12-02"));
+        tasks.add(todo);
+        tasks.add(deadline);
+        tasks.add(event);
+
+        ArrayList<Task> matchingTasks = tasks.find("book");
+
+        assertEquals(2, matchingTasks.size());
+        assertSame(todo, matchingTasks.get(0));
+        assertSame(deadline, matchingTasks.get(1));
+    }
+
+    @Test
+    public void find_keywordWithDifferentCase_matchingTasksReturned() {
+        TaskList tasks = new TaskList();
+        Todo task = new Todo("Read Book");
+        tasks.add(task);
+
+        ArrayList<Task> matchingTasks = tasks.find("book");
+
+        assertEquals(1, matchingTasks.size());
+        assertSame(task, matchingTasks.get(0));
+    }
+
+    @Test
+    public void find_noMatchingKeyword_emptyListReturned() {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("read book"));
+
+        ArrayList<Task> matchingTasks = tasks.find("meeting");
+
+        assertTrue(matchingTasks.isEmpty());
     }
 }

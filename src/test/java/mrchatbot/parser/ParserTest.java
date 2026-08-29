@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import mrchatbot.command.AddCommand;
 import mrchatbot.command.Command;
+import mrchatbot.command.FindCommand;
 import mrchatbot.command.ListCommand;
 import mrchatbot.command.MarkCommand;
 import mrchatbot.exception.MrChatbotException;
@@ -38,10 +39,32 @@ public class ParserTest {
     }
 
     @Test
+    public void parseCommand_findCommand_findCommandReturned() throws MrChatbotException {
+        Command command = parser.parseCommand("find book");
+
+        assertInstanceOf(FindCommand.class, command);
+    }
+
+    @Test
     public void parseCommand_bareMarkCommand_exceptionThrown() {
         MrChatbotException exception = assertThrows(MrChatbotException.class, () -> parser.parseCommand("mark"));
 
         assertEquals("Sorry, I don't understand that task format.", exception.getMessage());
+    }
+
+    @Test
+    public void parseCommand_blankFindKeyword_exceptionThrown() {
+        MrChatbotException exception = assertThrows(MrChatbotException.class,
+                () -> parser.parseCommand("find   "));
+
+        assertEquals("Find keyword cannot be empty. Please use the format: find <keyword>", exception.getMessage());
+    }
+
+    @Test
+    public void parseCommand_bareFindCommand_exceptionThrown() {
+        MrChatbotException exception = assertThrows(MrChatbotException.class, () -> parser.parseCommand("find"));
+
+        assertEquals("Find keyword cannot be empty. Please use the format: find <keyword>", exception.getMessage());
     }
 
     @Test

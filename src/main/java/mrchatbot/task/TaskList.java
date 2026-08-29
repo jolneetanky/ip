@@ -88,6 +88,21 @@ public class TaskList {
     }
 
     /**
+     * Returns tasks whose descriptions contain the given keyword, ignoring case.
+     */
+    public ArrayList<Task> find(String keyword) {
+        String lowerCaseKeyword = keyword.toLowerCase();
+        ArrayList<Task> matchingTasks = new ArrayList<>();
+
+        for (Task task : tasks) {
+            if (task.getDescription().toLowerCase().contains(lowerCaseKeyword)) {
+                matchingTasks.add(task);
+            }
+        }
+        return matchingTasks;
+    }
+
+    /**
      * Returns the task at the given one-based task number.
      */
     private Task getTask(int taskNumber) throws MrChatbotException {

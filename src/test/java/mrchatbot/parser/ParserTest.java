@@ -1,5 +1,9 @@
 package mrchatbot.parser;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
 
 import mrchatbot.command.AddCommand;
@@ -8,10 +12,6 @@ import mrchatbot.command.ListCommand;
 import mrchatbot.command.MarkCommand;
 import mrchatbot.exception.MrChatbotException;
 import mrchatbot.task.Task;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ParserTest {
     private final Parser parser = new Parser();

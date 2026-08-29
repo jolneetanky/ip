@@ -1,5 +1,9 @@
 package mrchatbot.storage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -14,10 +18,6 @@ import mrchatbot.task.Event;
 import mrchatbot.task.Task;
 import mrchatbot.task.TaskList;
 import mrchatbot.task.Todo;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StorageTest {
     @TempDir

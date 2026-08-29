@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class MrChatbot {
     private static final int MAX_TASKS = 100;
     private static final String SAVE_FILE_PATH = "data/duke.txt";
@@ -29,12 +27,11 @@ public class MrChatbot {
         ui.showWelcome(name);
 
         Storage storage = new Storage(SAVE_FILE_PATH);
-        // Store tasks in an ArrayList so tasks can be added and deleted easily.
-        ArrayList<Task> tasks = new ArrayList<>();
+        TaskList tasks = new TaskList();
 
         // Load tasks on startup
         try {
-            tasks = storage.loadTasks();
+            tasks = new TaskList(storage.loadTasks());
         } catch (MrChatbotException e) {
             ui.showError(e.getMessage());
         }
@@ -57,31 +54,20 @@ public class MrChatbot {
                     ui.showTaskList(tasks);
                 } else if (commandType == CommandType.MARK) {
                     int taskNumber = parser.parseTaskNumber(parser.commandArgument(input, CommandType.MARK));
-                    if (taskNumber < 1 || taskNumber > tasks.size()) {
-                        throw new MrChatbotException("This task doesn't exist...");
-                    }
-                    Task task = tasks.get(taskNumber - 1);
-                    task.markAsDone();
+                    Task task = tasks.mark(taskNumber);
                     storage.saveTasks(tasks);
                     ui.showTaskMarked(task);
                 } else if (commandType == CommandType.UNMARK) {
                     int taskNumber = parser.parseTaskNumber(parser.commandArgument(input, CommandType.UNMARK));
-                    if (taskNumber < 1 || taskNumber > tasks.size()) {
-                        throw new MrChatbotException("This task doesn't exist...");
-                    }
-                    Task task = tasks.get(taskNumber - 1);
-                    task.markAsNotDone();
+                    Task task = tasks.unmark(taskNumber);
                     storage.saveTasks(tasks);
                     ui.showTaskUnmarked(task);
                 } else if (commandType == CommandType.DELETE) {
                     int taskNumber = parser.parseTaskNumber(parser.commandArgument(input, CommandType.DELETE));
-                    if (taskNumber < 1 || taskNumber > tasks.size()) {
-                        throw new MrChatbotException("This task doesn't exist...");
-                    }
-                    Task task = tasks.remove(taskNumber - 1);
+                    Task task = tasks.delete(taskNumber);
                     storage.saveTasks(tasks);
                     ui.showTaskDeleted(task, tasks.size());
-                } else if (tasks.size() == MAX_TASKS) {
+                } else if (tasks.isFull(MAX_TASKS)) {
                     throw new MrChatbotException(
                             "Sorry, Mr " + name + ", your task list is full. No more tasks can be added.");
                 } else {

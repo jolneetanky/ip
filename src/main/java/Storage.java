@@ -53,7 +53,7 @@ public class Storage {
     /**
      * Saves all tasks to disk using one line per task.
      */
-    public void saveTasks(ArrayList<Task> tasks) throws MrChatbotException {
+    public void saveTasks(TaskList tasks) throws MrChatbotException {
         Path tempFile = null;
         try {
             Path parentDirectory = filePath.getParent();
@@ -61,7 +61,7 @@ public class Storage {
                 Files.createDirectories(parentDirectory);
             }
             ArrayList<String> taskLines = new ArrayList<>();
-            for (Task task : tasks) {
+            for (Task task : tasks.asArrayList()) {
                 taskLines.add(toStorageString(task));
             }
             if (parentDirectory == null) {

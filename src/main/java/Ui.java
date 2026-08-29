@@ -1,8 +1,8 @@
-import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
  * Handles all interactions with the user.
+ * This includes: 1. user inputs, 2. printing outputs
  */
 public class Ui {
     private static final String LINE = "____________________________________________________________";
@@ -86,7 +86,7 @@ public class Ui {
     /**
      * Shows all tasks in the list.
      */
-    public void showTaskList(ArrayList<Task> tasks) {
+    public void showTaskList(TaskList tasks) {
         System.out.println("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
             System.out.println((i + 1) + "." + tasks.get(i));

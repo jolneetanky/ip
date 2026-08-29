@@ -1,7 +1,6 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class MrChatbot {
     private static final int MAX_TASKS = 100;
@@ -257,29 +256,6 @@ public class MrChatbot {
     }
 
     /**
-     * Shows the user all accepted commands and their formats.
-     */
-    private static void printHelp() {
-        System.out.println("Accepted inputs:");
-        System.out.println("todo <description>");
-        System.out.println("deadline <description> /by <yyyy-mm-dd>");
-        System.out.println("event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>");
-        System.out.println("list");
-        System.out.println("mark <task number>");
-        System.out.println("unmark <task number>");
-        System.out.println("delete <task number>");
-        System.out.println("bye");
-        System.out.println("help");
-    }
-
-    /**
-     * Returns task or tasks depending on the task count.
-     */
-    private static String taskWord(int taskCount) {
-        return taskCount == 1 ? "task" : "tasks";
-    }
-
-    /**
      * Reads a task number from a command argument.
      */
     private static int parseTaskNumber(String taskNumberText) throws MrChatbotException {
@@ -294,20 +270,9 @@ public class MrChatbot {
     }
 
     public static void main(String[] args) {
-        String line = "____________________________________________________________";
-        String banner = "                       _           _   _           _   \n"
-                + " _ __ ___  _ __    ___| |__   __ _| |_| |__   ___ | |_ \n"
-                + "| '_ ` _ \\| '__|  / __| '_ \\ / _` | __| '_ \\ / _ \\| __|\n"
-                + "| | | | | | |    | (__| | | | (_| | |_| |_) | (_) | |_ \n"
-                + "|_| |_| |_|_|     \\___|_| |_|\\__,_|\\__|_.__/ \\___/ \\__|\n";
-
-        System.out.println(line);
-        System.out.println(banner);
-        System.out.println("Hello! I'm Mr Chatbot, your personal companion.");
-        Scanner scanner = new Scanner(System.in);
+        Ui ui = new Ui();
         String name = "User";
-        System.out.println("What can I do for you, Mr " + name + "?");
-        System.out.println(line);
+        ui.showWelcome(name);
 
         Storage storage = new Storage(SAVE_FILE_PATH);
         // Store tasks in an ArrayList so tasks can be added and deleted easily.
@@ -317,28 +282,25 @@ public class MrChatbot {
         try {
             tasks = storage.loadTasks();
         } catch (MrChatbotException e) {
-            System.out.println(e.getMessage());
+            ui.showError(e.getMessage());
         }
 
         // read inputs
-        while (scanner.hasNextLine()) {
-            String input = scanner.nextLine();
+        while (ui.hasNextInput()) {
+            String input = ui.readInput();
             String lowerCaseInput = input.toLowerCase();
-            System.out.println(line);
+            ui.showLine();
             if (CommandType.BYE.matchesExactly(lowerCaseInput)) {
-                System.out.println("Bye Mr " + name + ". Hope to see you again soon!");
-                System.out.println(line);
+                ui.showBye(name);
+                ui.showLine();
                 break;
             }
 
             try {
                 if (CommandType.HELP.matchesExactly(lowerCaseInput)) {
-                    printHelp();
+                    ui.showHelp();
                 } else if (CommandType.LIST.matchesExactly(lowerCaseInput)) {
-                    System.out.println("Here are the tasks in your list:");
-                    for (int i = 0; i < tasks.size(); i++) {
-                        System.out.println((i + 1) + "." + tasks.get(i));
-                    }
+                    ui.showTaskList(tasks);
                 } else if (lowerCaseInput.startsWith(CommandType.MARK.withTrailingSpace())) {
                     int taskNumber = parseTaskNumber(input.substring(CommandType.MARK.withTrailingSpace().length()));
                     if (taskNumber < 1 || taskNumber > tasks.size()) {
@@ -347,8 +309,7 @@ public class MrChatbot {
                     Task task = tasks.get(taskNumber - 1);
                     task.markAsDone();
                     storage.saveTasks(tasks);
-                    System.out.println("Nice! I've marked this task as done:");
-                    System.out.println("  " + task);
+                    ui.showTaskMarked(task);
                 } else if (lowerCaseInput.startsWith(CommandType.UNMARK.withTrailingSpace())) {
                     int taskNumber = parseTaskNumber(input.substring(CommandType.UNMARK.withTrailingSpace().length()));
                     if (taskNumber < 1 || taskNumber > tasks.size()) {
@@ -357,8 +318,7 @@ public class MrChatbot {
                     Task task = tasks.get(taskNumber - 1);
                     task.markAsNotDone();
                     storage.saveTasks(tasks);
-                    System.out.println("OK, I've marked this task as not done yet:");
-                    System.out.println("  " + task);
+                    ui.showTaskUnmarked(task);
                 } else if (lowerCaseInput.startsWith(CommandType.DELETE.withTrailingSpace())) {
                     int taskNumber = parseTaskNumber(input.substring(CommandType.DELETE.withTrailingSpace().length()));
                     if (taskNumber < 1 || taskNumber > tasks.size()) {
@@ -366,9 +326,7 @@ public class MrChatbot {
                     }
                     Task task = tasks.remove(taskNumber - 1);
                     storage.saveTasks(tasks);
-                    System.out.println("Noted. I've removed this task:");
-                    System.out.println("  " + task);
-                    System.out.println("Now you have " + tasks.size() + " " + taskWord(tasks.size()) + " in the list.");
+                    ui.showTaskDeleted(task, tasks.size());
                 } else if (tasks.size() == MAX_TASKS) {
                     throw new MrChatbotException(
                             "Sorry, Mr " + name + ", your task list is full. No more tasks can be added.");
@@ -376,14 +334,12 @@ public class MrChatbot {
                     Task task = createTask(input);
                     tasks.add(task);
                     storage.saveTasks(tasks);
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println("  " + task);
-                    System.out.println("Now you have " + tasks.size() + " " + taskWord(tasks.size()) + " in the list.");
+                    ui.showTaskAdded(task, tasks.size());
                 }
             } catch (MrChatbotException e) {
-                System.out.println(e.getMessage());
+                ui.showError(e.getMessage());
             }
-            System.out.println(line);
+            ui.showLine();
         }
     }
 }

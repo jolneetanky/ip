@@ -1,4 +1,9 @@
+package mrchatbot.ui;
+
 import java.util.Scanner;
+
+import mrchatbot.task.Task;
+import mrchatbot.task.TaskList;
 
 /**
  * Handles all interactions with the user.

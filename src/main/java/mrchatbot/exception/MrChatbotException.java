@@ -1,3 +1,5 @@
+package mrchatbot.exception;
+
 /**
  * Represents an error caused by invalid user input to Mr Chatbot.
  */

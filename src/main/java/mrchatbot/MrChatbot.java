@@ -1,3 +1,12 @@
+package mrchatbot;
+
+import mrchatbot.command.Command;
+import mrchatbot.exception.MrChatbotException;
+import mrchatbot.parser.Parser;
+import mrchatbot.storage.Storage;
+import mrchatbot.task.TaskList;
+import mrchatbot.ui.Ui;
+
 public class MrChatbot {
     private static final String SAVE_FILE_PATH = "data/duke.txt";
 

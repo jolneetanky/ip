@@ -42,19 +42,18 @@ public class MrChatbot {
         // read inputs
         while (ui.hasNextInput()) {
             String input = ui.readInput();
-            String lowerCaseInput = input.toLowerCase();
             CommandType commandType = parser.parseCommandType(input);
             ui.showLine();
-            if (commandType == CommandType.BYE && commandType.matchesExactly(lowerCaseInput)) {
+            if (commandType == CommandType.BYE) {
                 ui.showBye(name);
                 ui.showLine();
                 break;
             }
 
             try {
-                if (commandType == CommandType.HELP && commandType.matchesExactly(lowerCaseInput)) {
+                if (commandType == CommandType.HELP) {
                     ui.showHelp();
-                } else if (commandType == CommandType.LIST && commandType.matchesExactly(lowerCaseInput)) {
+                } else if (commandType == CommandType.LIST) {
                     ui.showTaskList(tasks);
                 } else if (commandType == CommandType.MARK) {
                     int taskNumber = parser.parseTaskNumber(parser.commandArgument(input, CommandType.MARK));

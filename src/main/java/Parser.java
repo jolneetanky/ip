@@ -247,15 +247,18 @@ enum CommandType {
     }
 
     boolean matches(String lowerCaseInput) {
+        if (requiresExactMatch()) {
+            return lowerCaseInput.equals(word);
+        }
         return lowerCaseInput.equals(word) || lowerCaseInput.startsWith(word + " ");
-    }
-
-    boolean matchesExactly(String lowerCaseInput) {
-        return lowerCaseInput.equals(word);
     }
 
     String withTrailingSpace() {
         return word + " ";
+    }
+
+    private boolean requiresExactMatch() {
+        return this == LIST || this == HELP || this == BYE;
     }
 
     static CommandType from(String input) {

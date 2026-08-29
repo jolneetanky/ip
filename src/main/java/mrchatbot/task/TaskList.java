@@ -1,4 +1,8 @@
+package mrchatbot.task;
+
 import java.util.ArrayList;
+
+import mrchatbot.exception.MrChatbotException;
 
 /**
  * Contains the user's tasks and provides operations on the task list.

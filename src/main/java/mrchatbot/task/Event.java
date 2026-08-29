@@ -1,3 +1,5 @@
+package mrchatbot.task;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -17,6 +19,20 @@ public class Event extends Task {
         super(description);
         this.from = from;
         this.to = to;
+    }
+
+    /**
+     * Returns the event start date.
+     */
+    public LocalDate getFrom() {
+        return from;
+    }
+
+    /**
+     * Returns the event end date.
+     */
+    public LocalDate getTo() {
+        return to;
     }
 
     @Override

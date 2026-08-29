@@ -34,10 +34,10 @@ From the repository root, run:
 python3 .codex/skills/test-ui/scripts/run-ui-tests.py
 ```
 
-The script compiles `src/main/java/*.java`, runs `MrChatbot` once per test case,
-and compares exact stdout with the expected output. It prints a console-session
-record containing the input, expected output, and actual output for each tested
-case.
+The script compiles Java source files recursively under `src/main/java`, runs
+`mrchatbot.MrChatbot` once per test case, and compares exact stdout with the
+expected output. It prints a console-session record containing the input,
+expected output, and actual output for each tested case.
 
 If a test case fails, the script terminates immediately, reports the failing
 test case, shows the actual and expected outputs, prints a unified diff, and

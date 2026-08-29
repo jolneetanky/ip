@@ -1,3 +1,5 @@
+package mrchatbot.task;
+
 /**
  * Represents a task in the chatbot's task list.
  */
@@ -32,6 +34,20 @@ public class Task {
      */
     public void markAsNotDone() {
         isDone = false;
+    }
+
+    /**
+     * Returns the task description.
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Returns true if this task is marked as done.
+     */
+    public boolean isDone() {
+        return isDone;
     }
 
     /**

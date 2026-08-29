@@ -70,7 +70,7 @@ def parse_test_plan(plan_path: Path) -> list[TestCase]:
 
 
 def compile_sources(repo: Path, output_dir: Path) -> None:
-    source_files = sorted((repo / "src/main/java").glob("*.java"))
+    source_files = sorted((repo / "src/main/java").rglob("*.java"))
     if not source_files:
         raise ValueError("No Java source files found in src/main/java")
     command = ["javac", "-d", str(output_dir), *[str(path) for path in source_files]]
@@ -125,7 +125,7 @@ def show_session(case: TestCase, actual_output: str) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--plan", default="test/ui-test-plan.md")
-    parser.add_argument("--main-class", default="MrChatbot")
+    parser.add_argument("--main-class", default="mrchatbot.MrChatbot")
     args = parser.parse_args()
 
     repo = Path.cwd()

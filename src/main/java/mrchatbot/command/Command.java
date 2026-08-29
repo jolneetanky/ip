@@ -1,3 +1,10 @@
+package mrchatbot.command;
+
+import mrchatbot.exception.MrChatbotException;
+import mrchatbot.storage.Storage;
+import mrchatbot.task.TaskList;
+import mrchatbot.ui.Ui;
+
 /**
  * Represents an executable user command.
  */

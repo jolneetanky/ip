@@ -1,3 +1,5 @@
+package mrchatbot.storage;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -6,6 +8,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+
+import mrchatbot.exception.MrChatbotException;
+import mrchatbot.task.Deadline;
+import mrchatbot.task.Event;
+import mrchatbot.task.Task;
+import mrchatbot.task.TaskList;
+import mrchatbot.task.Todo;
 
 /**
  * Handles saving tasks to, and loading tasks from, the hard disk.
@@ -172,14 +181,14 @@ public class Storage {
     private String toStorageString(Task task) {
         if (task instanceof Deadline) {
             Deadline deadline = (Deadline) task;
-            return joinFields("D", statusOf(task), deadline.description, deadline.by.toString());
+            return joinFields("D", statusOf(task), deadline.getDescription(), deadline.getBy().toString());
         }
         if (task instanceof Event) {
             Event event = (Event) task;
-            return joinFields("E", statusOf(task), event.description,
-                    event.from.toString(), event.to.toString());
+            return joinFields("E", statusOf(task), event.getDescription(),
+                    event.getFrom().toString(), event.getTo().toString());
         }
-        return joinFields("T", statusOf(task), task.description);
+        return joinFields("T", statusOf(task), task.getDescription());
     }
 
     /**
@@ -197,7 +206,7 @@ public class Storage {
      * Returns 1 if the task is done, or 0 otherwise.
      */
     private String statusOf(Task task) {
-        return task.isDone ? "1" : "0";
+        return task.isDone() ? "1" : "0";
     }
 
     /**

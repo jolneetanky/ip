@@ -1,3 +1,11 @@
+package mrchatbot.command;
+
+import mrchatbot.exception.MrChatbotException;
+import mrchatbot.storage.Storage;
+import mrchatbot.task.Task;
+import mrchatbot.task.TaskList;
+import mrchatbot.ui.Ui;
+
 /**
  * Adds a task to the task list.
  */

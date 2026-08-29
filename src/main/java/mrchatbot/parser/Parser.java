@@ -1,5 +1,21 @@
+package mrchatbot.parser;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+
+import mrchatbot.command.AddCommand;
+import mrchatbot.command.Command;
+import mrchatbot.command.DeleteCommand;
+import mrchatbot.command.ExitCommand;
+import mrchatbot.command.HelpCommand;
+import mrchatbot.command.ListCommand;
+import mrchatbot.command.MarkCommand;
+import mrchatbot.command.UnmarkCommand;
+import mrchatbot.exception.MrChatbotException;
+import mrchatbot.task.Deadline;
+import mrchatbot.task.Event;
+import mrchatbot.task.Task;
+import mrchatbot.task.Todo;
 
 /**
  * Makes sense of user commands and converts task commands into task objects.
@@ -248,52 +264,5 @@ public class Parser {
             return missingParts.replace(" and ", ", ") + ", and " + newPart;
         }
         return missingParts + " and " + newPart;
-    }
-}
-
-/**
- * Represents the command words accepted by the chatbot.
- */
-enum CommandType {
-    TODO("todo"),
-    DEADLINE("deadline"),
-    EVENT("event"),
-    LIST("list"),
-    MARK("mark"),
-    UNMARK("unmark"),
-    DELETE("delete"),
-    BYE("bye"),
-    HELP("help"),
-    UNKNOWN("");
-
-    final String word;
-
-    CommandType(String word) {
-        this.word = word;
-    }
-
-    boolean matches(String lowerCaseInput) {
-        if (requiresExactMatch()) {
-            return lowerCaseInput.equals(word);
-        }
-        return lowerCaseInput.equals(word) || lowerCaseInput.startsWith(word + " ");
-    }
-
-    String withTrailingSpace() {
-        return word + " ";
-    }
-
-    private boolean requiresExactMatch() {
-        return this == LIST || this == HELP || this == BYE;
-    }
-
-    static CommandType from(String input) {
-        String lowerCaseInput = input.toLowerCase();
-        for (CommandType commandType : values()) {
-            if (commandType != UNKNOWN && commandType.matches(lowerCaseInput)) {
-                return commandType;
-            }
-        }
-        return UNKNOWN;
     }
 }

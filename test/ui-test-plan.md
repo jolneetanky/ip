@@ -28,6 +28,7 @@ General command behavior:
 - `todo` with no description is rejected with a description-specific error.
 - `delete <task number>` removes the matching task from the list.
 - `delete` without a task number is rejected.
+- `find <keyword>` lists tasks whose descriptions contain the keyword.
 - Unknown commands ask the user to type `help`.
 - `help` lists all accepted inputs and their formats.
 
@@ -713,6 +714,7 @@ list
 mark <task number>
 unmark <task number>
 delete <task number>
+find <keyword>
 bye
 help
 ____________________________________________________________
@@ -972,6 +974,80 @@ ____________________________________________________________
 Sorry, I could not load your tasks.
 ____________________________________________________________
 Here are the tasks in your list:
+____________________________________________________________
+____________________________________________________________
+Bye Mr User. Hope to see you again soon!
+____________________________________________________________
+```
+
+### TC-027 Find Tasks By Keyword
+
+Aim: Verify that `find <keyword>` lists tasks whose descriptions contain the keyword.
+
+Initial storage:
+
+```text
+T | 1 | read book
+D | 1 | return book | 2019-12-01
+E | 0 | project meeting | 2019-12-01 | 2019-12-02
+```
+
+Inputs:
+
+```text
+find book
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+                       _           _   _           _   
+ _ __ ___  _ __    ___| |__   __ _| |_| |__   ___ | |_ 
+| '_ ` _ \| '__|  / __| '_ \ / _` | __| '_ \ / _ \| __|
+| | | | | | |    | (__| | | | (_| | |_| |_) | (_) | |_ 
+|_| |_| |_|_|     \___|_| |_|\__,_|\__|_.__/ \___/ \__|
+
+Hello! I'm Mr Chatbot, your personal companion.
+What can I do for you, Mr User?
+____________________________________________________________
+____________________________________________________________
+Here are the matching tasks in your list:
+1.[T][X] read book
+2.[D][X] return book (by: Dec 1 2019)
+____________________________________________________________
+____________________________________________________________
+Bye Mr User. Hope to see you again soon!
+____________________________________________________________
+```
+
+### TC-028 Find Command Without Keyword
+
+Aim: Verify that `find` without a keyword is rejected with a keyword-specific message.
+
+Inputs:
+
+```text
+find
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+                       _           _   _           _   
+ _ __ ___  _ __    ___| |__   __ _| |_| |__   ___ | |_ 
+| '_ ` _ \| '__|  / __| '_ \ / _` | __| '_ \ / _ \| __|
+| | | | | | |    | (__| | | | (_| | |_| |_) | (_) | |_ 
+|_| |_| |_|_|     \___|_| |_|\__,_|\__|_.__/ \___/ \__|
+
+Hello! I'm Mr Chatbot, your personal companion.
+What can I do for you, Mr User?
+____________________________________________________________
+____________________________________________________________
+Find keyword cannot be empty. Please use the format: find <keyword>
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!

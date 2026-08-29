@@ -7,6 +7,7 @@ import mrchatbot.command.AddCommand;
 import mrchatbot.command.Command;
 import mrchatbot.command.DeleteCommand;
 import mrchatbot.command.ExitCommand;
+import mrchatbot.command.FindCommand;
 import mrchatbot.command.HelpCommand;
 import mrchatbot.command.ListCommand;
 import mrchatbot.command.MarkCommand;
@@ -36,6 +37,8 @@ public class Parser {
             "Deadline description and /by cannot be empty. " + DEADLINE_FORMAT_MESSAGE;
     private static final String EVENT_FORMAT_MESSAGE =
             "Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>";
+    private static final String FIND_FORMAT_MESSAGE =
+            "Find keyword cannot be empty. Please use the format: find <keyword>";
     private static final String DEADLINE_DATE_FORMAT_MESSAGE =
             "Deadline date must be in yyyy-mm-dd format. " + DEADLINE_FORMAT_MESSAGE;
     private static final String EVENT_DATE_FORMAT_MESSAGE =
@@ -71,6 +74,12 @@ public class Parser {
         if (commandType == CommandType.DELETE) {
             return new DeleteCommand(parseTaskNumber(commandArgument(input, CommandType.DELETE)));
         }
+        if (commandType == CommandType.FIND) {
+            if (input.toLowerCase().equals(CommandType.FIND.word)) {
+                throw new MrChatbotException(FIND_FORMAT_MESSAGE);
+            }
+            return new FindCommand(parseFindKeyword(commandArgument(input, CommandType.FIND)));
+        }
         return new AddCommand(createTask(input));
     }
 
@@ -93,7 +102,10 @@ public class Parser {
             throw new MrChatbotException(eventMissingMessage(true, true, true));
         }
 
-        if (commandType == CommandType.MARK || commandType == CommandType.UNMARK || commandType == CommandType.DELETE) {
+        if (commandType == CommandType.MARK
+                || commandType == CommandType.UNMARK
+                || commandType == CommandType.DELETE
+                || commandType == CommandType.FIND) {
             throw new MrChatbotException(INVALID_TASK_FORMAT_MESSAGE);
         }
 
@@ -185,6 +197,16 @@ public class Parser {
             throw new MrChatbotException(INVALID_TASK_FORMAT_MESSAGE);
         }
         return input.substring(commandType.withTrailingSpace().length());
+    }
+
+    /**
+     * Parses and validates the keyword used for finding tasks.
+     */
+    private String parseFindKeyword(String keyword) throws MrChatbotException {
+        if (keyword.isBlank()) {
+            throw new MrChatbotException(FIND_FORMAT_MESSAGE);
+        }
+        return keyword.trim();
     }
 
     /**

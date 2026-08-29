@@ -11,6 +11,7 @@ public enum CommandType {
     MARK("mark"),
     UNMARK("unmark"),
     DELETE("delete"),
+    FIND("find"),
     BYE("bye"),
     HELP("help"),
     UNKNOWN("");

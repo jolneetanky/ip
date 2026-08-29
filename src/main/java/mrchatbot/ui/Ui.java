@@ -1,5 +1,6 @@
 package mrchatbot.ui;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import mrchatbot.task.Task;
@@ -86,6 +87,7 @@ public class Ui {
         System.out.println("mark <task number>");
         System.out.println("unmark <task number>");
         System.out.println("delete <task number>");
+        System.out.println("find <keyword>");
         System.out.println("bye");
         System.out.println("help");
     }
@@ -132,6 +134,16 @@ public class Ui {
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + task);
         System.out.println("Now you have " + taskCount + " " + taskWord(taskCount) + " in the list.");
+    }
+
+    /**
+     * Shows all tasks that match a find command.
+     */
+    public void showMatchingTasks(ArrayList<Task> matchingTasks) {
+        System.out.println("Here are the matching tasks in your list:");
+        for (int i = 0; i < matchingTasks.size(); i++) {
+            System.out.println((i + 1) + "." + matchingTasks.get(i));
+        }
     }
 
     /**

@@ -1,0 +1,27 @@
+/**
+ * Adds a task to the task list.
+ */
+public class AddCommand extends Command {
+    private static final int MAX_TASKS = 100;
+    private static final String TASK_LIST_FULL_MESSAGE =
+            "Sorry, Mr User, your task list is full. No more tasks can be added.";
+
+    private final Task task;
+
+    /**
+     * Creates a command that adds the given task.
+     */
+    public AddCommand(Task task) {
+        this.task = task;
+    }
+
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws MrChatbotException {
+        if (tasks.isFull(MAX_TASKS)) {
+            throw new MrChatbotException(TASK_LIST_FULL_MESSAGE);
+        }
+        tasks.add(task);
+        storage.saveTasks(tasks);
+        ui.showTaskAdded(task, tasks.size());
+    }
+}

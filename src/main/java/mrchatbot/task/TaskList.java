@@ -37,7 +37,7 @@ public class TaskList {
      * Returns true if the task list has reached the given limit.
      */
     public boolean isFull(int maxTasks) {
-        return tasks.size() == maxTasks;
+        return tasks.size() >= maxTasks;
     }
 
     /**

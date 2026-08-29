@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,9 +102,9 @@ public class Storage {
         if (taskType.equals("T") && parts.size() == 3) {
             task = new Todo(parts.get(2));
         } else if (taskType.equals("D") && parts.size() == 4) {
-            task = new Deadline(parts.get(2), parts.get(3));
+            task = new Deadline(parts.get(2), parseDate(parts.get(3)));
         } else if (taskType.equals("E") && parts.size() == 5) {
-            task = new Event(parts.get(2), parts.get(3), parts.get(4));
+            task = new Event(parts.get(2), parseDate(parts.get(3)), parseDate(parts.get(4)));
         } else {
             throw new MrChatbotException(LOAD_ERROR_MESSAGE);
         }
@@ -128,7 +130,7 @@ public class Storage {
 
         for (int i = 0; i < line.length(); i++) {
             char character = line.charAt(i);
-            // only 2 escaped cahracters are allowed: \|, and ||
+            // Only two escaped characters are allowed: \| and \\.
             if (isEscaped) {
                 if (character != '\\' && character != '|') {
                     throw new MrChatbotException(LOAD_ERROR_MESSAGE);
@@ -170,13 +172,25 @@ public class Storage {
     private String toStorageString(Task task) {
         if (task instanceof Deadline) {
             Deadline deadline = (Deadline) task;
-            return joinFields("D", statusOf(task), deadline.description, deadline.by);
+            return joinFields("D", statusOf(task), deadline.description, deadline.by.toString());
         }
         if (task instanceof Event) {
             Event event = (Event) task;
-            return joinFields("E", statusOf(task), event.description, event.from, event.to);
+            return joinFields("E", statusOf(task), event.description,
+                    event.from.toString(), event.to.toString());
         }
         return joinFields("T", statusOf(task), task.description);
+    }
+
+    /**
+     * Parses a saved ISO date into a LocalDate.
+     */
+    private LocalDate parseDate(String dateText) throws MrChatbotException {
+        try {
+            return LocalDate.parse(dateText);
+        } catch (DateTimeParseException e) {
+            throw new MrChatbotException(LOAD_ERROR_MESSAGE);
+        }
     }
 
     /**

@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -7,14 +9,20 @@ public class MrChatbot {
     private static final String INVALID_TASK_FORMAT_MESSAGE = "Sorry, I don't understand that task format.";
     private static final String UNKNOWN_COMMAND_MESSAGE = "Sorry, I don't understand that command. Please type \"help\".";
     private static final String TODO_FORMAT_MESSAGE = "Todo description cannot be empty. Please use the format: todo <description>";
-    private static final String DEADLINE_FORMAT_MESSAGE = "Please use the format: deadline <description> /by <deadline>";
+    private static final String DEADLINE_FORMAT_MESSAGE =
+            "Please use the format: deadline <description> /by <yyyy-mm-dd>";
     private static final String DEADLINE_DESCRIPTION_MISSING_MESSAGE =
             "Deadline description cannot be empty. " + DEADLINE_FORMAT_MESSAGE;
     private static final String DEADLINE_BY_MISSING_MESSAGE =
             "Deadline /by cannot be empty. " + DEADLINE_FORMAT_MESSAGE;
     private static final String DEADLINE_DESCRIPTION_AND_BY_MISSING_MESSAGE =
             "Deadline description and /by cannot be empty. " + DEADLINE_FORMAT_MESSAGE;
-    private static final String EVENT_FORMAT_MESSAGE = "Please use the format: event <description> /from <start> /to <end>";
+    private static final String EVENT_FORMAT_MESSAGE =
+            "Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>";
+    private static final String DEADLINE_DATE_FORMAT_MESSAGE =
+            "Deadline date must be in yyyy-mm-dd format. " + DEADLINE_FORMAT_MESSAGE;
+    private static final String EVENT_DATE_FORMAT_MESSAGE =
+            "Event dates must be in yyyy-mm-dd format. " + EVENT_FORMAT_MESSAGE;
 
     /**
      * Represents the command words accepted by the chatbot.
@@ -132,7 +140,7 @@ public class MrChatbot {
             if (by.isBlank()) {
                 throw new MrChatbotException(DEADLINE_BY_MISSING_MESSAGE);
             }
-            return new Deadline(description, by);
+            return new Deadline(description, parseDate(by, DEADLINE_DATE_FORMAT_MESSAGE));
         }
 
         if (commandType == CommandType.EVENT) {
@@ -159,10 +167,23 @@ public class MrChatbot {
             if (isDescriptionMissing || isFromMissing || isToMissing) {
                 throw new MrChatbotException(eventMissingMessage(isDescriptionMissing, isFromMissing, isToMissing));
             }
-            return new Event(description, from, to);
+            return new Event(description,
+                    parseDate(from, EVENT_DATE_FORMAT_MESSAGE),
+                    parseDate(to, EVENT_DATE_FORMAT_MESSAGE));
         }
 
         throw new MrChatbotException(UNKNOWN_COMMAND_MESSAGE);
+    }
+
+    /**
+     * Parses a date in the command format accepted by the chatbot.
+     */
+    private static LocalDate parseDate(String dateText, String errorMessage) throws MrChatbotException {
+        try {
+            return LocalDate.parse(dateText.trim());
+        } catch (DateTimeParseException e) {
+            throw new MrChatbotException(errorMessage);
+        }
     }
 
     /**
@@ -241,8 +262,8 @@ public class MrChatbot {
     private static void printHelp() {
         System.out.println("Accepted inputs:");
         System.out.println("todo <description>");
-        System.out.println("deadline <description> /by <deadline>");
-        System.out.println("event <description> /from <start> /to <end>");
+        System.out.println("deadline <description> /by <yyyy-mm-dd>");
+        System.out.println("event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>");
         System.out.println("list");
         System.out.println("mark <task number>");
         System.out.println("unmark <task number>");

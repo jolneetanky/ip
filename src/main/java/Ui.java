@@ -13,12 +13,14 @@ public class Ui {
             + "|_| |_| |_|_|     \\___|_| |_|\\__,_|\\__|_.__/ \\___/ \\__|\n";
 
     private final Scanner scanner;
+    private final String name;
 
     /**
      * Creates a UI helper that reads user commands from standard input.
      */
-    public Ui() {
+    public Ui(String name) {
         scanner = new Scanner(System.in);
+        this.name = name;
     }
 
     /**
@@ -38,7 +40,7 @@ public class Ui {
     /**
      * Shows the startup banner and greeting.
      */
-    public void showWelcome(String name) {
+    public void showWelcome() {
         System.out.println(LINE);
         System.out.println(BANNER);
         System.out.println("Hello! I'm Mr Chatbot, your personal companion.");
@@ -56,7 +58,7 @@ public class Ui {
     /**
      * Shows the exit message.
      */
-    public void showBye(String name) {
+    public void showBye() {
         System.out.println("Bye Mr " + name + ". Hope to see you again soon!");
     }
 

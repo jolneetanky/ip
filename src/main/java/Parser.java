@@ -31,6 +31,23 @@ public class Parser {
     }
 
     /**
+     * Parses exact commands that have already been extracted as Command classes.
+     */
+    public Command parseCommand(String input) {
+        CommandType commandType = parseCommandType(input);
+        if (commandType == CommandType.BYE) {
+            return new ExitCommand();
+        }
+        if (commandType == CommandType.HELP) {
+            return new HelpCommand();
+        }
+        if (commandType == CommandType.LIST) {
+            return new ListCommand();
+        }
+        return null;
+    }
+
+    /**
      * Creates a task from the user's command.
      */
     public Task createTask(String input) throws MrChatbotException {

@@ -21,10 +21,10 @@ public class MrChatbot {
     }
 
     public static void main(String[] args) {
-        Ui ui = new Ui();
         Parser parser = new Parser();
         String name = "User";
-        ui.showWelcome(name);
+        Ui ui = new Ui(name);
+        ui.showWelcome();
 
         Storage storage = new Storage(SAVE_FILE_PATH);
         TaskList tasks = new TaskList();
@@ -41,17 +41,15 @@ public class MrChatbot {
             String input = ui.readInput();
             CommandType commandType = parser.parseCommandType(input);
             ui.showLine();
-            if (commandType == CommandType.BYE) {
-                ui.showBye(name);
-                ui.showLine();
-                break;
-            }
 
             try {
-                if (commandType == CommandType.HELP) {
-                    ui.showHelp();
-                } else if (commandType == CommandType.LIST) {
-                    ui.showTaskList(tasks);
+                Command command = parser.parseCommand(input);
+                if (command != null) {
+                    command.execute(tasks, ui, storage);
+                    if (command.isExit()) {
+                        ui.showLine();
+                        break;
+                    }
                 } else if (commandType == CommandType.MARK) {
                     int taskNumber = parser.parseTaskNumber(parser.commandArgument(input, CommandType.MARK));
                     Task task = tasks.mark(taskNumber);

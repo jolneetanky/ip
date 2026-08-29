@@ -22,8 +22,10 @@ import mrchatbot.task.Todo;
  */
 public class Parser {
     private static final String INVALID_TASK_FORMAT_MESSAGE = "Sorry, I don't understand that task format.";
-    private static final String UNKNOWN_COMMAND_MESSAGE = "Sorry, I don't understand that command. Please type \"help\".";
-    private static final String TODO_FORMAT_MESSAGE = "Todo description cannot be empty. Please use the format: todo <description>";
+    private static final String UNKNOWN_COMMAND_MESSAGE =
+            "Sorry, I don't understand that command. Please type \"help\".";
+    private static final String TODO_FORMAT_MESSAGE =
+            "Todo description cannot be empty. Please use the format: todo <description>";
     private static final String DEADLINE_FORMAT_MESSAGE =
             "Please use the format: deadline <description> /by <yyyy-mm-dd>";
     private static final String DEADLINE_DESCRIPTION_MISSING_MESSAGE =

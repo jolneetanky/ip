@@ -35,6 +35,9 @@ public class Event extends Task {
         return to;
     }
 
+    /**
+     * Returns the event in the display format used by the chatbot.
+     */
     @Override
     public String toString() {
         return "[E][" + getStatusIcon() + "] " + description

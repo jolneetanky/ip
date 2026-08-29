@@ -7,6 +7,9 @@ import mrchatbot.storage.Storage;
 import mrchatbot.task.TaskList;
 import mrchatbot.ui.Ui;
 
+/**
+ * Runs Mr Chatbot and coordinates parsing, storage, task operations, and UI output.
+ */
 public class MrChatbot {
     private static final String SAVE_FILE_PATH = "data/duke.txt";
 
@@ -28,6 +31,9 @@ public class MrChatbot {
         return titleCaseName;
     }
 
+    /**
+     * Starts the chatbot and processes commands until the user exits or input ends.
+     */
     public static void main(String[] args) {
         Parser parser = new Parser();
         String name = "User";

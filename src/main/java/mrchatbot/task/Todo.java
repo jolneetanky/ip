@@ -11,6 +11,9 @@ public class Todo extends Task {
         super(description);
     }
 
+    /**
+     * Returns the todo in the display format used by the chatbot.
+     */
     @Override
     public String toString() {
         return "[T][" + getStatusIcon() + "] " + description;

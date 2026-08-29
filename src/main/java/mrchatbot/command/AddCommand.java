@@ -23,6 +23,9 @@ public class AddCommand extends Command {
         this.task = task;
     }
 
+    /**
+     * Adds the task, saves the updated task list, and shows the added-task message.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws MrChatbotException {
         if (tasks.isFull(MAX_TASKS)) {

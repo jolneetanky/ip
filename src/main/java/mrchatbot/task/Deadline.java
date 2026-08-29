@@ -26,6 +26,9 @@ public class Deadline extends Task {
         return by;
     }
 
+    /**
+     * Returns the deadline in the display format used by the chatbot.
+     */
     @Override
     public String toString() {
         return "[D][" + getStatusIcon() + "] " + description + " (by: " + by.format(DISPLAY_DATE_FORMAT) + ")";

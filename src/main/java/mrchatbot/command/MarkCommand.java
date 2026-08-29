@@ -19,6 +19,9 @@ public class MarkCommand extends Command {
         this.taskNumber = taskNumber;
     }
 
+    /**
+     * Marks the task, saves the updated task list, and shows the marked-task message.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws MrChatbotException {
         Task task = tasks.mark(taskNumber);

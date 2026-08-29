@@ -3,6 +3,7 @@ import java.util.Scanner;
 
 public class MrChatbot {
     private static final int MAX_TASKS = 100;
+    private static final String SAVE_FILE_PATH = "data/duke.txt";
     private static final String INVALID_TASK_FORMAT_MESSAGE = "Sorry, I don't understand that task format.";
     private static final String UNKNOWN_COMMAND_MESSAGE = "Sorry, I don't understand that command. Please type \"help\".";
     private static final String TODO_FORMAT_MESSAGE = "Todo description cannot be empty. Please use the format: todo <description>";
@@ -282,14 +283,23 @@ public class MrChatbot {
         System.out.println(line);
         System.out.println(banner);
         System.out.println("Hello! I'm Mr Chatbot, your personal companion.");
-//        System.out.println("What is your name?");
         Scanner scanner = new Scanner(System.in);
         String name = "User";
         System.out.println("What can I do for you, Mr " + name + "?");
         System.out.println(line);
 
+        Storage storage = new Storage(SAVE_FILE_PATH);
         // Store tasks in an ArrayList so tasks can be added and deleted easily.
         ArrayList<Task> tasks = new ArrayList<>();
+
+        // Load tasks on startup
+        try {
+            tasks = storage.loadTasks();
+        } catch (MrChatbotException e) {
+            System.out.println(e.getMessage());
+        }
+
+        // read inputs
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine();
             String lowerCaseInput = input.toLowerCase();
@@ -315,6 +325,7 @@ public class MrChatbot {
                     }
                     Task task = tasks.get(taskNumber - 1);
                     task.markAsDone();
+                    storage.saveTasks(tasks);
                     System.out.println("Nice! I've marked this task as done:");
                     System.out.println("  " + task);
                 } else if (lowerCaseInput.startsWith(CommandType.UNMARK.withTrailingSpace())) {
@@ -324,6 +335,7 @@ public class MrChatbot {
                     }
                     Task task = tasks.get(taskNumber - 1);
                     task.markAsNotDone();
+                    storage.saveTasks(tasks);
                     System.out.println("OK, I've marked this task as not done yet:");
                     System.out.println("  " + task);
                 } else if (lowerCaseInput.startsWith(CommandType.DELETE.withTrailingSpace())) {
@@ -332,6 +344,7 @@ public class MrChatbot {
                         throw new MrChatbotException("This task doesn't exist...");
                     }
                     Task task = tasks.remove(taskNumber - 1);
+                    storage.saveTasks(tasks);
                     System.out.println("Noted. I've removed this task:");
                     System.out.println("  " + task);
                     System.out.println("Now you have " + tasks.size() + " " + taskWord(tasks.size()) + " in the list.");
@@ -341,6 +354,7 @@ public class MrChatbot {
                 } else {
                     Task task = createTask(input);
                     tasks.add(task);
+                    storage.saveTasks(tasks);
                     System.out.println("Got it. I've added this task:");
                     System.out.println("  " + task);
                     System.out.println("Now you have " + tasks.size() + " " + taskWord(tasks.size()) + " in the list.");

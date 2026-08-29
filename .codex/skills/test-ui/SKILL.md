@@ -19,6 +19,13 @@ Use one `###` heading per test case. Each case must contain:
 The first input line should include the user name, because this chatbot asks for
 the name before accepting commands.
 
+Cases that verify persistence may also include:
+
+- `Initial storage:` followed by a fenced `text` block containing the exact
+  contents to write to `data/duke.txt` before the chatbot starts.
+- `Expected storage:` followed by a fenced `text` block containing the exact
+  expected final contents of `data/duke.txt`.
+
 ## Run Tests
 
 From the repository root, run:

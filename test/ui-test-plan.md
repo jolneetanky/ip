@@ -31,6 +31,10 @@ General command behavior:
 - Unknown commands ask the user to type `help`.
 - `help` lists all accepted inputs and their formats.
 
+Some cases also include `Initial storage:` to write `data/duke.txt` before the
+chatbot starts, and `Expected storage:` to verify its final contents after the
+console session.
+
 ### TC-001 Todo Command Without Description
 
 Aim: Verify that `todo` without a description is rejected with a description-specific error.
@@ -483,7 +487,7 @@ ____________________________________________________________
 
 ### TC-015 Event Command With Description, From, And To Arguments
 
-Aim: Verify that `event <description> /from <start> /to <end>` creates an event task.
+Aim: Verify that `event <description> /from <start> /to <end>` creates an event task and saves it to disk.
 
 Inputs:
 
@@ -513,6 +517,12 @@ ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
 ____________________________________________________________
+```
+
+Expected storage:
+
+```text
+E | 0 | meeting | Mon 2pm | 4pm
 ```
 
 ### TC-016 Event Command With Description, To, And From Arguments
@@ -551,7 +561,7 @@ ____________________________________________________________
 
 ### TC-017 Delete Command
 
-Aim: Verify that `delete <task number>` removes the matching task and shifts the remaining tasks.
+Aim: Verify that `delete <task number>` removes the matching task, shifts the remaining tasks, and saves the updated list to disk.
 
 Inputs:
 
@@ -598,6 +608,12 @@ ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!
 ____________________________________________________________
+```
+
+Expected storage:
+
+```text
+T | 0 | return book
 ```
 
 ### TC-018 Unknown Command
@@ -763,6 +779,167 @@ What can I do for you, Mr User?
 ____________________________________________________________
 ____________________________________________________________
 Sorry, I don't understand that task format.
+____________________________________________________________
+____________________________________________________________
+Bye Mr User. Hope to see you again soon!
+____________________________________________________________
+```
+
+### TC-023 Load Saved Tasks
+
+Aim: Verify that saved tasks are loaded from disk when the chatbot starts.
+
+Initial storage:
+
+```text
+T | 1 | read book
+D | 0 | return book | Sunday
+E | 0 | meeting | Mon 2pm | 4pm
+```
+
+Inputs:
+
+```text
+list
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+                       _           _   _           _   
+ _ __ ___  _ __    ___| |__   __ _| |_| |__   ___ | |_ 
+| '_ ` _ \| '__|  / __| '_ \ / _` | __| '_ \ / _ \| __|
+| | | | | | |    | (__| | | | (_| | |_| |_) | (_) | |_ 
+|_| |_| |_|_|     \___|_| |_|\__,_|\__|_.__/ \___/ \__|
+
+Hello! I'm Mr Chatbot, your personal companion.
+What can I do for you, Mr User?
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read book
+2.[D][ ] return book (by: Sunday)
+3.[E][ ] meeting (from: Mon 2pm to: 4pm)
+____________________________________________________________
+____________________________________________________________
+Bye Mr User. Hope to see you again soon!
+____________________________________________________________
+```
+
+### TC-024 Save Task With Storage Delimiters
+
+Aim: Verify that task text containing pipe and backslash characters is escaped when saved to disk.
+
+Inputs:
+
+```text
+todo read | book \ notes
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+                       _           _   _           _   
+ _ __ ___  _ __    ___| |__   __ _| |_| |__   ___ | |_ 
+| '_ ` _ \| '__|  / __| '_ \ / _` | __| '_ \ / _ \| __|
+| | | | | | |    | (__| | | | (_| | |_| |_) | (_) | |_ 
+|_| |_| |_|_|     \___|_| |_|\__,_|\__|_.__/ \___/ \__|
+
+Hello! I'm Mr Chatbot, your personal companion.
+What can I do for you, Mr User?
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read | book \ notes
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Bye Mr User. Hope to see you again soon!
+____________________________________________________________
+```
+
+Expected storage:
+
+```text
+T | 0 | read \| book \\ notes
+```
+
+### TC-025 Load Task With Escaped Storage Delimiters
+
+Aim: Verify that escaped pipe and backslash characters are restored when saved tasks are loaded.
+
+Initial storage:
+
+```text
+T | 1 | read \| book \\ notes
+```
+
+Inputs:
+
+```text
+list
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+                       _           _   _           _   
+ _ __ ___  _ __    ___| |__   __ _| |_| |__   ___ | |_ 
+| '_ ` _ \| '__|  / __| '_ \ / _` | __| '_ \ / _ \| __|
+| | | | | | |    | (__| | | | (_| | |_| |_) | (_) | |_ 
+|_| |_| |_|_|     \___|_| |_|\__,_|\__|_.__/ \___/ \__|
+
+Hello! I'm Mr Chatbot, your personal companion.
+What can I do for you, Mr User?
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read | book \ notes
+____________________________________________________________
+____________________________________________________________
+Bye Mr User. Hope to see you again soon!
+____________________________________________________________
+```
+
+### TC-026 Malformed Storage File
+
+Aim: Verify that malformed saved data shows a storage error and starts with an empty task list.
+
+Initial storage:
+
+```text
+X | 0 | invalid task
+```
+
+Inputs:
+
+```text
+list
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+                       _           _   _           _   
+ _ __ ___  _ __    ___| |__   __ _| |_| |__   ___ | |_ 
+| '_ ` _ \| '__|  / __| '_ \ / _` | __| '_ \ / _ \| __|
+| | | | | | |    | (__| | | | (_| | |_| |_) | (_) | |_ 
+|_| |_| |_|_|     \___|_| |_|\__,_|\__|_.__/ \___/ \__|
+
+Hello! I'm Mr Chatbot, your personal companion.
+What can I do for you, Mr User?
+____________________________________________________________
+Sorry, I could not load your tasks.
+____________________________________________________________
+Here are the tasks in your list:
 ____________________________________________________________
 ____________________________________________________________
 Bye Mr User. Hope to see you again soon!

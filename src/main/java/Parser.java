@@ -33,7 +33,7 @@ public class Parser {
     /**
      * Parses exact commands that have already been extracted as Command classes.
      */
-    public Command parseCommand(String input) {
+    public Command parseCommand(String input) throws MrChatbotException {
         CommandType commandType = parseCommandType(input);
         if (commandType == CommandType.BYE) {
             return new ExitCommand();
@@ -43,6 +43,15 @@ public class Parser {
         }
         if (commandType == CommandType.LIST) {
             return new ListCommand();
+        }
+        if (commandType == CommandType.MARK) {
+            return new MarkCommand(parseTaskNumber(commandArgument(input, CommandType.MARK)));
+        }
+        if (commandType == CommandType.UNMARK) {
+            return new UnmarkCommand(parseTaskNumber(commandArgument(input, CommandType.UNMARK)));
+        }
+        if (commandType == CommandType.DELETE) {
+            return new DeleteCommand(parseTaskNumber(commandArgument(input, CommandType.DELETE)));
         }
         return null;
     }

@@ -39,7 +39,6 @@ public class MrChatbot {
         // read inputs
         while (ui.hasNextInput()) {
             String input = ui.readInput();
-            CommandType commandType = parser.parseCommandType(input);
             ui.showLine();
 
             try {
@@ -50,21 +49,6 @@ public class MrChatbot {
                         ui.showLine();
                         break;
                     }
-                } else if (commandType == CommandType.MARK) {
-                    int taskNumber = parser.parseTaskNumber(parser.commandArgument(input, CommandType.MARK));
-                    Task task = tasks.mark(taskNumber);
-                    storage.saveTasks(tasks);
-                    ui.showTaskMarked(task);
-                } else if (commandType == CommandType.UNMARK) {
-                    int taskNumber = parser.parseTaskNumber(parser.commandArgument(input, CommandType.UNMARK));
-                    Task task = tasks.unmark(taskNumber);
-                    storage.saveTasks(tasks);
-                    ui.showTaskUnmarked(task);
-                } else if (commandType == CommandType.DELETE) {
-                    int taskNumber = parser.parseTaskNumber(parser.commandArgument(input, CommandType.DELETE));
-                    Task task = tasks.delete(taskNumber);
-                    storage.saveTasks(tasks);
-                    ui.showTaskDeleted(task, tasks.size());
                 } else if (tasks.isFull(MAX_TASKS)) {
                     throw new MrChatbotException(
                             "Sorry, Mr " + name + ", your task list is full. No more tasks can be added.");

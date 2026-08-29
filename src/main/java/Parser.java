@@ -53,7 +53,7 @@ public class Parser {
         if (commandType == CommandType.DELETE) {
             return new DeleteCommand(parseTaskNumber(commandArgument(input, CommandType.DELETE)));
         }
-        return null;
+        return new AddCommand(createTask(input));
     }
 
     /**

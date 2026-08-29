@@ -1,5 +1,4 @@
 public class MrChatbot {
-    private static final int MAX_TASKS = 100;
     private static final String SAVE_FILE_PATH = "data/duke.txt";
 
     /**
@@ -43,20 +42,10 @@ public class MrChatbot {
 
             try {
                 Command command = parser.parseCommand(input);
-                if (command != null) {
-                    command.execute(tasks, ui, storage);
-                    if (command.isExit()) {
-                        ui.showLine();
-                        break;
-                    }
-                } else if (tasks.isFull(MAX_TASKS)) {
-                    throw new MrChatbotException(
-                            "Sorry, Mr " + name + ", your task list is full. No more tasks can be added.");
-                } else {
-                    Task task = parser.createTask(input);
-                    tasks.add(task);
-                    storage.saveTasks(tasks);
-                    ui.showTaskAdded(task, tasks.size());
+                command.execute(tasks, ui, storage);
+                if (command.isExit()) {
+                    ui.showLine();
+                    break;
                 }
             } catch (MrChatbotException e) {
                 ui.showError(e.getMessage());

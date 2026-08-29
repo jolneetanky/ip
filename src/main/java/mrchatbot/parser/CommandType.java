@@ -17,10 +17,16 @@ public enum CommandType {
 
     final String word;
 
+    /**
+     * Creates a command type for the given command word.
+     */
     CommandType(String word) {
         this.word = word;
     }
 
+    /**
+     * Returns true if the lower-case input belongs to this command type.
+     */
     boolean matches(String lowerCaseInput) {
         if (requiresExactMatch()) {
             return lowerCaseInput.equals(word);
@@ -28,14 +34,23 @@ public enum CommandType {
         return lowerCaseInput.equals(word) || lowerCaseInput.startsWith(word + " ");
     }
 
+    /**
+     * Returns the command word followed by one space for prefix parsing.
+     */
     String withTrailingSpace() {
         return word + " ";
     }
 
+    /**
+     * Returns true if this command must not accept trailing arguments.
+     */
     private boolean requiresExactMatch() {
         return this == LIST || this == HELP || this == BYE;
     }
 
+    /**
+     * Finds the command type that matches the user's raw input.
+     */
     static CommandType from(String input) {
         String lowerCaseInput = input.toLowerCase();
         for (CommandType commandType : values()) {

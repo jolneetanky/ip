@@ -27,8 +27,7 @@ public class StorageTest {
     public void saveTasks_taskWithSpecialCharacters_escapesSpecialCharacters() throws Exception {
         Path filePath = tempDir.resolve("duke.txt");
         Storage storage = new Storage(filePath.toString());
-        TaskList tasks = new TaskList();
-        tasks.add(new Todo("read | book \\ notes"));
+        TaskList tasks = new TaskList(new Todo("read | book \\ notes"));
 
         storage.saveTasks(tasks);
 
@@ -39,8 +38,7 @@ public class StorageTest {
     public void saveTasks_nestedMissingDirectory_createsDirectoryAndFile() throws Exception {
         Path filePath = tempDir.resolve("data").resolve("duke.txt");
         Storage storage = new Storage(filePath.toString());
-        TaskList tasks = new TaskList();
-        tasks.add(new Todo("read book"));
+        TaskList tasks = new TaskList(new Todo("read book"));
 
         storage.saveTasks(tasks);
 
@@ -109,14 +107,11 @@ public class StorageTest {
     public void saveAndLoadTasks_todoDeadlineEvent_tasksRoundTripped() throws Exception {
         Path filePath = tempDir.resolve("duke.txt");
         Storage storage = new Storage(filePath.toString());
-        TaskList tasks = new TaskList();
         Todo todo = new Todo("read book");
         Deadline deadline = new Deadline("return book", LocalDate.parse("2019-12-01"));
         Event event = new Event("project meeting", LocalDate.parse("2019-12-01"), LocalDate.parse("2019-12-02"));
         deadline.markAsDone();
-        tasks.add(todo);
-        tasks.add(deadline);
-        tasks.add(event);
+        TaskList tasks = new TaskList(todo, deadline, event);
 
         storage.saveTasks(tasks);
         ArrayList<Task> loadedTasks = storage.loadTasks();

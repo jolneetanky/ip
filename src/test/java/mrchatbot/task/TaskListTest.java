@@ -23,34 +23,29 @@ public class TaskListTest {
 
     @Test
     public void isFull_taskCountBelowLimit_false() {
-        TaskList tasks = new TaskList();
-        tasks.add(new Todo("read book"));
+        TaskList tasks = new TaskList(new Todo("read book"));
 
         assertFalse(tasks.isFull(2));
     }
 
     @Test
     public void isFull_taskCountAtLimit_true() {
-        TaskList tasks = new TaskList();
-        tasks.add(new Todo("read book"));
+        TaskList tasks = new TaskList(new Todo("read book"));
 
         assertTrue(tasks.isFull(1));
     }
 
     @Test
     public void isFull_taskCountAboveLimit_true() {
-        TaskList tasks = new TaskList();
-        tasks.add(new Todo("read book"));
-        tasks.add(new Todo("return book"));
+        TaskList tasks = new TaskList(new Todo("read book"), new Todo("return book"));
 
         assertTrue(tasks.isFull(1));
     }
 
     @Test
     public void mark_existingTask_taskMarkedAndReturned() throws MrChatbotException {
-        TaskList tasks = new TaskList();
         Todo task = new Todo("read book");
-        tasks.add(task);
+        TaskList tasks = new TaskList(task);
 
         Task markedTask = tasks.mark(1);
 
@@ -60,10 +55,9 @@ public class TaskListTest {
 
     @Test
     public void unmark_existingDoneTask_taskUnmarkedAndReturned() throws MrChatbotException {
-        TaskList tasks = new TaskList();
         Todo task = new Todo("read book");
         task.markAsDone();
-        tasks.add(task);
+        TaskList tasks = new TaskList(task);
 
         Task unmarkedTask = tasks.unmark(1);
 
@@ -73,11 +67,9 @@ public class TaskListTest {
 
     @Test
     public void delete_existingTask_taskRemovedAndReturned() throws MrChatbotException {
-        TaskList tasks = new TaskList();
         Todo firstTask = new Todo("read book");
         Todo secondTask = new Todo("return book");
-        tasks.add(firstTask);
-        tasks.add(secondTask);
+        TaskList tasks = new TaskList(firstTask, secondTask);
 
         Task deletedTask = tasks.delete(1);
 
@@ -88,8 +80,7 @@ public class TaskListTest {
 
     @Test
     public void mark_zeroTaskNumber_exceptionThrown() {
-        TaskList tasks = new TaskList();
-        tasks.add(new Todo("read book"));
+        TaskList tasks = new TaskList(new Todo("read book"));
 
         MrChatbotException exception = assertThrows(MrChatbotException.class, () -> tasks.mark(0));
         assertEquals("This task doesn't exist...", exception.getMessage());
@@ -97,8 +88,7 @@ public class TaskListTest {
 
     @Test
     public void delete_taskNumberAboveSize_exceptionThrown() {
-        TaskList tasks = new TaskList();
-        tasks.add(new Todo("read book"));
+        TaskList tasks = new TaskList(new Todo("read book"));
 
         MrChatbotException exception = assertThrows(MrChatbotException.class, () -> tasks.delete(2));
         assertEquals("This task doesn't exist...", exception.getMessage());
@@ -106,13 +96,10 @@ public class TaskListTest {
 
     @Test
     public void find_matchingKeyword_matchingTasksReturned() {
-        TaskList tasks = new TaskList();
         Todo todo = new Todo("read book");
         Deadline deadline = new Deadline("return book", LocalDate.parse("2019-12-01"));
         Event event = new Event("project meeting", LocalDate.parse("2019-12-01"), LocalDate.parse("2019-12-02"));
-        tasks.add(todo);
-        tasks.add(deadline);
-        tasks.add(event);
+        TaskList tasks = new TaskList(todo, deadline, event);
 
         ArrayList<Task> matchingTasks = tasks.find("book");
 
@@ -123,9 +110,8 @@ public class TaskListTest {
 
     @Test
     public void find_keywordWithDifferentCase_matchingTasksReturned() {
-        TaskList tasks = new TaskList();
         Todo task = new Todo("Read Book");
-        tasks.add(task);
+        TaskList tasks = new TaskList(task);
 
         ArrayList<Task> matchingTasks = tasks.find("book");
 
@@ -135,8 +121,7 @@ public class TaskListTest {
 
     @Test
     public void find_noMatchingKeyword_emptyListReturned() {
-        TaskList tasks = new TaskList();
-        tasks.add(new Todo("read book"));
+        TaskList tasks = new TaskList(new Todo("read book"));
 
         ArrayList<Task> matchingTasks = tasks.find("meeting");
 

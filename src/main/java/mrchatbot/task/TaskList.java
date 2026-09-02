@@ -20,6 +20,16 @@ public class TaskList {
     }
 
     /**
+     * Creates a task list containing the given tasks.
+     */
+    public TaskList(Task... tasks) {
+        this.tasks = new ArrayList<>();
+        for (Task task : tasks) {
+            this.tasks.add(task);
+        }
+    }
+
+    /**
      * Creates a task list using tasks loaded from storage.
      */
     public TaskList(ArrayList<Task> tasks) {

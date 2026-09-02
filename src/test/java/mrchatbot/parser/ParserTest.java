@@ -54,8 +54,8 @@ public class ParserTest {
 
     @Test
     public void parseCommand_blankFindKeyword_exceptionThrown() {
-        MrChatbotException exception = assertThrows(MrChatbotException.class,
-                () -> parser.parseCommand("find   "));
+        MrChatbotException exception = assertThrows(
+                MrChatbotException.class, () -> parser.parseCommand("find   "));
 
         assertEquals("Find keyword cannot be empty. Please use the format: find <keyword>", exception.getMessage());
     }
@@ -97,8 +97,8 @@ public class ParserTest {
 
     @Test
     public void createTask_invalidDeadlineDate_exceptionThrown() {
-        MrChatbotException exception = assertThrows(MrChatbotException.class,
-                () -> parser.createTask("deadline return book /by 12/01/2019"));
+        MrChatbotException exception = assertThrows(
+                MrChatbotException.class, () -> parser.createTask("deadline return book /by 12/01/2019"));
 
         assertEquals("Deadline date must be in yyyy-mm-dd format. "
                 + "Please use the format: deadline <description> /by <yyyy-mm-dd>", exception.getMessage());
@@ -106,8 +106,8 @@ public class ParserTest {
 
     @Test
     public void createTask_missingEventTo_exceptionThrown() {
-        MrChatbotException exception = assertThrows(MrChatbotException.class,
-                () -> parser.createTask("event project meeting /from 2019-12-01"));
+        MrChatbotException exception = assertThrows(
+                MrChatbotException.class, () -> parser.createTask("event project meeting /from 2019-12-01"));
 
         assertEquals("Event /to cannot be empty. "
                 + "Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>",

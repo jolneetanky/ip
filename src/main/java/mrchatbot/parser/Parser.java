@@ -245,10 +245,10 @@ public class Parser {
 
     /**
      * Extracts an event value until the other event delimiter, if the other delimiter comes later.
-     * Suppose we have <delimiter> <value> <otherDelimiter>
-     * This function extracts <value>.
+     * Suppose we have a delimiter, a value, then the other delimiter.
+     * This function extracts the value.
      *
-     * `valueIndex`: the starting index of <delimiter>.
+     * The valueIndex parameter is the starting index of the delimiter.
      */
     private String eventValue(String input, int valueIndex, int delimiterLength, int otherIndex) {
         int valueStartIndex = valueIndex + delimiterLength;

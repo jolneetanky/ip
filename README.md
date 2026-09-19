@@ -2,6 +2,8 @@
 
 This is a project template for a greenfield Java project. The chatbot is named "mr chatbot". Given below are instructions on how to use it.
 
+For commands, recurring schedules, and saving your tasks, see the [Mr Chatbot User Guide](docs/README.md).
+
 ## Setting up in Intellij
 
 Prerequisites: JDK 25, update Intellij to the most recent version.

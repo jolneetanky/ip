@@ -31,6 +31,9 @@ Ensure that Java 25 is used when running the application or build tasks. On macO
 
 ## Git
 
+Follow the [course standards and conventions](https://nus-cs2103-ay2627-s1.github.io/website/admin/standardsAndConventions.html) for every commit, including the linked [SE-EDU Git conventions](https://se-education.org/guides/conventions/git.html).
+Use capitalized, imperative subjects without a trailing period; aim for at most 50 characters and never exceed 72.
+Separate the subject from the body with a blank line, wrap body text at 72 characters, and explain what changed and why.
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.

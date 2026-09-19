@@ -8,24 +8,6 @@ import mrchatbot.ui.Ui;
  */
 public class MrChatbot {
     /**
-     * Converts a name to title case, where the first letter of each word is capitalized.
-     */
-    private static String toTitleCase(String name) {
-        if (name.trim().isEmpty()) {
-            return "";
-        }
-        String[] words = name.trim().toLowerCase().split("\\s+");
-        String titleCaseName = "";
-        for (String word : words) {
-            if (!titleCaseName.isEmpty()) {
-                titleCaseName += " ";
-            }
-            titleCaseName += word.substring(0, 1).toUpperCase() + word.substring(1);
-        }
-        return titleCaseName;
-    }
-
-    /**
      * Starts the chatbot and processes commands until the user exits or input ends.
      */
     public static void main(String[] args) {

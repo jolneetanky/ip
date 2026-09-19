@@ -48,4 +48,6 @@ Tasks start incomplete. Marking one done completes its current occurrence withou
 
 Changes save automatically to `data/mr-chatbot.txt` inside the folder you launch the app from. Start it from the same folder each time to see the same tasks. A missing save file starts an empty list.
 
+Upgrading from an older version? Close the app and copy `data/duke.txt` to `data/mr-chatbot.txt` before starting the new version, but only if the new file does not already exist. Keep the old file as a backup; the app does not migrate it automatically.
+
 If a command is rejected, read the message, correct its format or dates, and send it again. For a task-number error, run `list` first. If saving fails, check that the launch folder is writable; your latest changes may not survive closing the app. If loading fails, keep a backup of `data/mr-chatbot.txt` before editing it or adding new tasks.

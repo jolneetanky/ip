@@ -19,3 +19,29 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
    ```
 
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+
+## Recurring tasks
+
+Create a task that resets daily or weekly:
+
+```text
+recurring exercise /every day
+recurring project meeting /every week /on monday
+recurring weekly review /every week
+```
+
+Weekly tasks accept an optional `/on` followed by a full weekday name
+(Monday through Sunday, ignoring case). Without `/on`, the schedule uses
+the weekday the task is created. Daily tasks do not accept `/on`.
+
+Each task starts incomplete. Daily tasks first reset tomorrow; weekly
+tasks first reset on the next scheduled weekday. If that weekday is
+today, the first reset is next week. Use the existing `mark`, `unmark`,
+`find`, and `delete` commands with recurring tasks as usual.
+
+Reset dates use the computer's local calendar. At startup and before each
+command, expired tasks become incomplete and advance to the first future
+scheduled reset. Marking a task done does not move its schedule. Missed
+occurrences do not create extra tasks. The list displays the schedule
+and next reset date; changes are saved across restarts. There is no
+background timer, so an idle display updates when you issue a command.

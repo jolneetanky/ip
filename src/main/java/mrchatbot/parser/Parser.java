@@ -87,21 +87,7 @@ public class Parser {
      * Creates a task from the user's command.
      */
     public Task createTask(String input) throws MrChatbotException {
-        String lowerCaseInput = input.toLowerCase();
         CommandType commandType = CommandType.from(input);
-
-        if (lowerCaseInput.equals(CommandType.TODO.word)) {
-            throw new MrChatbotException(TODO_FORMAT_MESSAGE);
-        }
-
-        if (lowerCaseInput.equals(CommandType.DEADLINE.word)) {
-            throw new MrChatbotException(DEADLINE_DESCRIPTION_AND_BY_MISSING_MESSAGE);
-        }
-
-        if (lowerCaseInput.equals(CommandType.EVENT.word)) {
-            throw new MrChatbotException(eventMissingMessage(true, true, true));
-        }
-
         if (commandType == CommandType.MARK
                 || commandType == CommandType.UNMARK
                 || commandType == CommandType.DELETE
@@ -110,69 +96,98 @@ public class Parser {
         }
 
         if (commandType == CommandType.TODO) {
-            String description = input.substring(CommandType.TODO.withTrailingSpace().length());
-            if (description.isBlank()) {
-                throw new MrChatbotException(TODO_FORMAT_MESSAGE);
-            }
-            return new Todo(description);
+            return parseTodo(input);
         }
-
         if (commandType == CommandType.DEADLINE) {
-            int byIndex = lowerCaseInput.indexOf(" /by ");
-            if (byIndex == -1) {
-                String description = input.substring(CommandType.DEADLINE.withTrailingSpace().length());
-                if (description.isBlank()) {
-                    throw new MrChatbotException(DEADLINE_DESCRIPTION_AND_BY_MISSING_MESSAGE);
-                }
-                throw new MrChatbotException(DEADLINE_BY_MISSING_MESSAGE);
-            }
-            if (byIndex <= CommandType.DEADLINE.withTrailingSpace().length()) {
-                throw new MrChatbotException(DEADLINE_DESCRIPTION_MISSING_MESSAGE);
-            }
-            String description = input.substring(CommandType.DEADLINE.withTrailingSpace().length(), byIndex);
-            String by = input.substring(byIndex + " /by ".length());
-            if (description.isBlank() && by.isBlank()) {
+            return parseDeadline(input);
+        }
+        if (commandType == CommandType.EVENT) {
+            return parseEvent(input);
+        }
+        throw new MrChatbotException(UNKNOWN_COMMAND_MESSAGE);
+    }
+
+    /**
+     * Parses a todo command and checks that its description is present.
+     */
+    private Todo parseTodo(String input) throws MrChatbotException {
+        if (input.equalsIgnoreCase(CommandType.TODO.word)) {
+            throw new MrChatbotException(TODO_FORMAT_MESSAGE);
+        }
+        String description = input.substring(CommandType.TODO.withTrailingSpace().length());
+        if (description.isBlank()) {
+            throw new MrChatbotException(TODO_FORMAT_MESSAGE);
+        }
+        return new Todo(description);
+    }
+
+    /**
+     * Parses a deadline command, preserving specific errors for missing fields.
+     */
+    private Deadline parseDeadline(String input) throws MrChatbotException {
+        if (input.equalsIgnoreCase(CommandType.DEADLINE.word)) {
+            throw new MrChatbotException(DEADLINE_DESCRIPTION_AND_BY_MISSING_MESSAGE);
+        }
+        String lowerCaseInput = input.toLowerCase();
+        int byIndex = lowerCaseInput.indexOf(" /by ");
+        if (byIndex == -1) {
+            String description = input.substring(CommandType.DEADLINE.withTrailingSpace().length());
+            if (description.isBlank()) {
                 throw new MrChatbotException(DEADLINE_DESCRIPTION_AND_BY_MISSING_MESSAGE);
             }
-            if (description.isBlank()) {
-                throw new MrChatbotException(DEADLINE_DESCRIPTION_MISSING_MESSAGE);
-            }
-            if (by.isBlank()) {
-                throw new MrChatbotException(DEADLINE_BY_MISSING_MESSAGE);
-            }
-            return new Deadline(description, parseDate(by, DEADLINE_DATE_FORMAT_MESSAGE));
+            throw new MrChatbotException(DEADLINE_BY_MISSING_MESSAGE);
+        }
+        if (byIndex <= CommandType.DEADLINE.withTrailingSpace().length()) {
+            throw new MrChatbotException(DEADLINE_DESCRIPTION_MISSING_MESSAGE);
+        }
+        String description = input.substring(CommandType.DEADLINE.withTrailingSpace().length(), byIndex);
+        String by = input.substring(byIndex + " /by ".length());
+        if (description.isBlank() && by.isBlank()) {
+            throw new MrChatbotException(DEADLINE_DESCRIPTION_AND_BY_MISSING_MESSAGE);
+        }
+        if (description.isBlank()) {
+            throw new MrChatbotException(DEADLINE_DESCRIPTION_MISSING_MESSAGE);
+        }
+        if (by.isBlank()) {
+            throw new MrChatbotException(DEADLINE_BY_MISSING_MESSAGE);
+        }
+        return new Deadline(description, parseDate(by, DEADLINE_DATE_FORMAT_MESSAGE));
+    }
+
+    /**
+     * Parses an event command with its date delimiters in either order.
+     */
+    private Event parseEvent(String input) throws MrChatbotException {
+        if (input.equalsIgnoreCase(CommandType.EVENT.word)) {
+            throw new MrChatbotException(eventMissingMessage(true, true, true));
+        }
+        String lowerCaseInput = input.toLowerCase();
+        int fromIndex = lowerCaseInput.indexOf(" /from ");
+        int toIndex = lowerCaseInput.indexOf(" /to ");
+        String description = eventDescription(input, fromIndex, toIndex);
+        boolean isDescriptionMissing = description.isBlank();
+        boolean hasFrom = fromIndex != -1;
+        boolean hasTo = toIndex != -1;
+        boolean isFromMissing = !hasFrom;
+        boolean isToMissing = !hasTo;
+        String from = "";
+        String to = "";
+
+        if (hasFrom) {
+            from = eventValue(input, fromIndex, " /from ".length(), toIndex);
+            isFromMissing = from.isBlank();
+        }
+        if (hasTo) {
+            to = eventValue(input, toIndex, " /to ".length(), fromIndex);
+            isToMissing = to.isBlank();
         }
 
-        if (commandType == CommandType.EVENT) {
-            int fromIndex = lowerCaseInput.indexOf(" /from ");
-            int toIndex = lowerCaseInput.indexOf(" /to ");
-            String description = eventDescription(input, fromIndex, toIndex);
-            boolean isDescriptionMissing = description.isBlank();
-            boolean hasFrom = fromIndex != -1;
-            boolean hasTo = toIndex != -1;
-            boolean isFromMissing = !hasFrom;
-            boolean isToMissing = !hasTo;
-            String from = "";
-            String to = "";
-
-            if (hasFrom) {
-                from = eventValue(input, fromIndex, " /from ".length(), toIndex);
-                isFromMissing = from.isBlank();
-            }
-            if (hasTo) {
-                to = eventValue(input, toIndex, " /to ".length(), fromIndex);
-                isToMissing = to.isBlank();
-            }
-
-            if (isDescriptionMissing || isFromMissing || isToMissing) {
-                throw new MrChatbotException(eventMissingMessage(isDescriptionMissing, isFromMissing, isToMissing));
-            }
-            return new Event(description,
-                    parseDate(from, EVENT_DATE_FORMAT_MESSAGE),
-                    parseDate(to, EVENT_DATE_FORMAT_MESSAGE));
+        if (isDescriptionMissing || isFromMissing || isToMissing) {
+            throw new MrChatbotException(eventMissingMessage(isDescriptionMissing, isFromMissing, isToMissing));
         }
-
-        throw new MrChatbotException(UNKNOWN_COMMAND_MESSAGE);
+        return new Event(description,
+                parseDate(from, EVENT_DATE_FORMAT_MESSAGE),
+                parseDate(to, EVENT_DATE_FORMAT_MESSAGE));
     }
 
     /**

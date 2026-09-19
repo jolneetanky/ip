@@ -113,4 +113,65 @@ public class ParserTest {
                 + "Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>",
                 exception.getMessage());
     }
+
+    @Test
+    public void createTask_reversedEventDelimiters_datesAssignedToCorrectFields() throws MrChatbotException {
+        Task task = parser.createTask("EVENT project meeting /TO 2019-12-02 /FROM 2019-12-01");
+
+        assertEquals("[E][ ] project meeting (from: Dec 1 2019 to: Dec 2 2019)", task.toString());
+    }
+
+    @Test
+    public void createTask_missingEventFields_specificMessagesPreserved() {
+        String[][] cases = {
+            {"event", "description, /from, and /to"},
+            {"event project meeting", "/from and /to"},
+            {"event /from 2019-12-01 /to 2019-12-02", "description"},
+            {"event /from 2019-12-01", "description and /to"},
+            {"event /to 2019-12-02", "description and /from"},
+            {"event project meeting /to 2019-12-02", "/from"},
+            {"event project meeting /from  /to 2019-12-02", "/from"},
+            {"event project meeting /from 2019-12-01 /to ", "/to"}
+        };
+
+        for (String[] testCase : cases) {
+            MrChatbotException exception = assertThrows(
+                    MrChatbotException.class, () -> parser.createTask(testCase[0]), testCase[0]);
+
+            assertEquals("Event " + testCase[1] + " cannot be empty. "
+                    + "Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>",
+                    exception.getMessage(), testCase[0]);
+        }
+    }
+
+    @Test
+    public void createTask_missingDeadlineFields_specificMessagesPreserved() {
+        String[][] cases = {
+            {"deadline", "description and /by"},
+            {"deadline   ", "description and /by"},
+            {"deadline return book", "/by"},
+            {"deadline return book /by ", "/by"},
+            {"deadline /by 2019-12-01", "description"}
+        };
+
+        for (String[] testCase : cases) {
+            MrChatbotException exception = assertThrows(
+                    MrChatbotException.class, () -> parser.createTask(testCase[0]), testCase[0]);
+
+            assertEquals("Deadline " + testCase[1] + " cannot be empty. "
+                    + "Please use the format: deadline <description> /by <yyyy-mm-dd>",
+                    exception.getMessage(), testCase[0]);
+        }
+    }
+
+    @Test
+    public void createTask_missingTodoDescription_exceptionThrown() {
+        for (String input : new String[]{"todo", "TODO   "}) {
+            MrChatbotException exception = assertThrows(
+                    MrChatbotException.class, () -> parser.createTask(input));
+
+            assertEquals("Todo description cannot be empty. Please use the format: todo <description>",
+                    exception.getMessage());
+        }
+    }
 }

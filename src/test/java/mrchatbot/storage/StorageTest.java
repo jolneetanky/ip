@@ -16,6 +16,8 @@ import org.junit.jupiter.api.io.TempDir;
 import mrchatbot.exception.MrChatbotException;
 import mrchatbot.task.Deadline;
 import mrchatbot.task.Event;
+import mrchatbot.task.Recurrence;
+import mrchatbot.task.RecurringTask;
 import mrchatbot.task.Task;
 import mrchatbot.task.TaskList;
 import mrchatbot.task.Todo;
@@ -23,6 +25,41 @@ import mrchatbot.task.Todo;
 public class StorageTest {
     @TempDir
     private Path tempDir;
+
+    @Test
+    public void saveAndLoadTasks_recurringSchedules_preservesStatusDatesAndEscaping() throws Exception {
+        Storage storage = new Storage(tempDir.resolve("tasks.txt").toString());
+        RecurringTask daily = new RecurringTask("read | notes", Recurrence.DAY, LocalDate.of(2026, 9, 22));
+        RecurringTask weekly = new RecurringTask("meeting", Recurrence.WEEK, LocalDate.of(2026, 9, 28));
+        weekly.markAsDone();
+        storage.saveTasks(new TaskList(daily, weekly));
+
+        ArrayList<Task> loaded = storage.loadTasks();
+
+        assertEquals(daily.toString(), loaded.get(0).toString());
+        assertEquals(weekly.toString(), loaded.get(1).toString());
+        assertEquals(Recurrence.WEEK, ((RecurringTask) loaded.get(1)).getRecurrence());
+    }
+
+    @Test
+    public void loadTasks_invalidRecurringRecord_reportsLoadError() throws Exception {
+        Path path = tempDir.resolve("tasks.txt");
+        Storage storage = new Storage(path.toString());
+        String[] records = {
+            "R | 0 | meeting | MONTH | 2026-09-21",
+            "R | 0 | meeting | WEEK | invalid",
+            "R | 0 | meeting | WEEK | 2026-02-30",
+            "R | 0 | meeting | WEEK",
+            "R | 0 | meeting | WEEK | 2026-09-21 | extra",
+            "R | 0 | | DAY | 2026-09-21",
+            "R | 2 | meeting | WEEK | 2026-09-21"
+        };
+        for (String record : records) {
+            Files.writeString(path, record);
+            MrChatbotException exception = assertThrows(MrChatbotException.class, storage::loadTasks);
+            assertEquals("Sorry, I could not load your tasks.", exception.getMessage());
+        }
+    }
 
     @Test
     public void saveTasks_destinationIsNonemptyDirectory_cleansUpTemporaryFile() throws Exception {

@@ -5,6 +5,7 @@ package mrchatbot.parser;
  */
 public enum CommandType {
     TODO("todo"),
+    RECURRING("recurring"),
     DEADLINE("deadline"),
     EVENT("event"),
     LIST("list"),

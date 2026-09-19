@@ -12,6 +12,8 @@ import java.util.List;
 import mrchatbot.exception.MrChatbotException;
 import mrchatbot.task.Deadline;
 import mrchatbot.task.Event;
+import mrchatbot.task.Recurrence;
+import mrchatbot.task.RecurringTask;
 import mrchatbot.task.Task;
 import mrchatbot.task.TaskList;
 import mrchatbot.task.Todo;
@@ -134,6 +136,8 @@ public class Storage {
             task = new Deadline(parts.get(2), parseDate(parts.get(3)));
         } else if (taskType.equals("E") && parts.size() == 5) {
             task = new Event(parts.get(2), parseDate(parts.get(3)), parseDate(parts.get(4)));
+        } else if (taskType.equals("R") && parts.size() == 5) {
+            task = parseRecurringTask(parts);
         } else {
             throw new MrChatbotException(LOAD_ERROR_MESSAGE);
         }
@@ -146,6 +150,18 @@ public class Storage {
             task.markAsDone();
         }
         return task;
+    }
+
+    /**
+     * Restores the recurrence interval and scheduled date without recalculating them from today.
+     */
+    private RecurringTask parseRecurringTask(ArrayList<String> parts) throws MrChatbotException {
+        try {
+            Recurrence recurrence = Recurrence.valueOf(parts.get(3));
+            return new RecurringTask(parts.get(2), recurrence, parseDate(parts.get(4)));
+        } catch (IllegalArgumentException e) {
+            throw new MrChatbotException(LOAD_ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -202,6 +218,11 @@ public class Storage {
             Event event = (Event) task;
             return joinFields("E", statusOf(task), event.getDescription(),
                     event.getFrom().toString(), event.getTo().toString());
+        }
+        if (task instanceof RecurringTask) {
+            RecurringTask recurring = (RecurringTask) task;
+            return joinFields("R", statusOf(task), task.getDescription(), recurring.getRecurrence().name(),
+                    recurring.getNextResetDate().toString());
         }
         // All other supported task types return above; a new type needs its own storage format.
         assert task instanceof Todo : "Only Todo tasks may use the fallback storage format";

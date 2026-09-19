@@ -1,7 +1,13 @@
 package mrchatbot.parser;
 
+import java.time.Clock;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import mrchatbot.command.AddCommand;
 import mrchatbot.command.Command;
@@ -15,6 +21,8 @@ import mrchatbot.command.UnmarkCommand;
 import mrchatbot.exception.MrChatbotException;
 import mrchatbot.task.Deadline;
 import mrchatbot.task.Event;
+import mrchatbot.task.Recurrence;
+import mrchatbot.task.RecurringTask;
 import mrchatbot.task.Task;
 import mrchatbot.task.Todo;
 
@@ -22,6 +30,12 @@ import mrchatbot.task.Todo;
  * Makes sense of user commands and converts task commands into task objects.
  */
 public class Parser {
+    private static final String RECURRING_FORMAT_MESSAGE =
+            "Please use: recurring <description> /every day OR /every week [/on <weekday>].";
+    private static final Pattern RECURRING_PATTERN = Pattern.compile(
+            "^recurring\\s+(.+?)\\s+/every\\s+(day|week)(?:\\s+/on\\s+([a-z]+))?\\s*$",
+            Pattern.CASE_INSENSITIVE);
+
     private static final String INVALID_TASK_FORMAT_MESSAGE = "Sorry, I don't understand that task format.";
     private static final String UNKNOWN_COMMAND_MESSAGE =
             "Sorry, I don't understand that command. Please type \"help\".";
@@ -43,6 +57,22 @@ public class Parser {
             "Deadline date must be in yyyy-mm-dd format. " + DEADLINE_FORMAT_MESSAGE;
     private static final String EVENT_DATE_FORMAT_MESSAGE =
             "Event dates must be in yyyy-mm-dd format. " + EVENT_FORMAT_MESSAGE;
+
+    private final Clock clock;
+
+    /**
+     * Creates a parser using the local calendar date.
+     */
+    public Parser() {
+        this(Clock.systemDefaultZone());
+    }
+
+    /**
+     * Creates a parser with a controllable clock for recurrence scheduling.
+     */
+    public Parser(Clock clock) {
+        this.clock = clock;
+    }
 
     /**
      * Identifies the command word used by the user.
@@ -95,6 +125,9 @@ public class Parser {
             throw new MrChatbotException(INVALID_TASK_FORMAT_MESSAGE);
         }
 
+        if (commandType == CommandType.RECURRING) {
+            return parseRecurringTask(input);
+        }
         if (commandType == CommandType.TODO) {
             return parseTodo(input);
         }
@@ -105,6 +138,39 @@ public class Parser {
             return parseEvent(input);
         }
         throw new MrChatbotException(UNKNOWN_COMMAND_MESSAGE);
+    }
+
+    /**
+     * Parses daily or weekly recurrence and chooses the first reset strictly after today.
+     */
+    private RecurringTask parseRecurringTask(String input) throws MrChatbotException {
+        Matcher matcher = RECURRING_PATTERN.matcher(input);
+        if (!matcher.matches() || matcher.group(1).isBlank()) {
+            throw new MrChatbotException(RECURRING_FORMAT_MESSAGE);
+        }
+        String description = matcher.group(1).trim();
+        Recurrence recurrence = Recurrence.valueOf(matcher.group(2).toUpperCase(Locale.ROOT));
+        String weekday = matcher.group(3);
+        LocalDate today = LocalDate.now(clock);
+        if (recurrence == Recurrence.DAY) {
+            if (weekday != null) {
+                throw new MrChatbotException("Daily tasks cannot use /on. " + RECURRING_FORMAT_MESSAGE);
+            }
+            return new RecurringTask(description, recurrence, today.plusDays(1));
+        }
+        DayOfWeek resetDay = weekday == null ? today.getDayOfWeek() : parseWeekday(weekday);
+        return new RecurringTask(description, recurrence, today.with(TemporalAdjusters.next(resetDay)));
+    }
+
+    /**
+     * Reads a full weekday name without depending on the system language.
+     */
+    private DayOfWeek parseWeekday(String weekday) throws MrChatbotException {
+        try {
+            return DayOfWeek.valueOf(weekday.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new MrChatbotException("Use a weekday from monday to sunday. " + RECURRING_FORMAT_MESSAGE);
+        }
     }
 
     /**

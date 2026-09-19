@@ -95,6 +95,8 @@ public class Ui {
         output.println("todo <description>");
         output.println("deadline <description> /by <yyyy-mm-dd>");
         output.println("event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>");
+        output.println("recurring <description> /every day");
+        output.println("recurring <description> /every week [/on <weekday>]");
         output.println("list");
         output.println("mark <task number>");
         output.println("unmark <task number>");

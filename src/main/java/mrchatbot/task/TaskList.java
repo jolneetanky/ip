@@ -1,5 +1,6 @@
 package mrchatbot.task;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -108,6 +109,20 @@ public class TaskList {
         return tasks.stream()
                 .filter(task -> task.getDescription().toLowerCase().contains(lowerCaseKeyword))
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    /**
+     * Refreshes every recurring task and returns whether any reset changed the list.
+     */
+    public boolean refreshRecurringTasks(LocalDate today) {
+        boolean hasChanges = false;
+        for (Task task : tasks) {
+            if (task instanceof RecurringTask) {
+                boolean hasReset = ((RecurringTask) task).refresh(today);
+                hasChanges = hasChanges || hasReset;
+            }
+        }
+        return hasChanges;
     }
 
     /**

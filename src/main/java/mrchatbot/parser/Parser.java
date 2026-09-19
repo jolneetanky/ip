@@ -251,9 +251,12 @@ public class Parser {
         if (isDescriptionMissing || isFromMissing || isToMissing) {
             throw new MrChatbotException(eventMissingMessage(isDescriptionMissing, isFromMissing, isToMissing));
         }
-        return new Event(description,
-                parseDate(from, EVENT_DATE_FORMAT_MESSAGE),
-                parseDate(to, EVENT_DATE_FORMAT_MESSAGE));
+        LocalDate startDate = parseDate(from, EVENT_DATE_FORMAT_MESSAGE);
+        LocalDate endDate = parseDate(to, EVENT_DATE_FORMAT_MESSAGE);
+        if (!endDate.isAfter(startDate)) {
+            throw new MrChatbotException("Event end date must be after its start date. " + EVENT_FORMAT_MESSAGE);
+        }
+        return new Event(description, startDate, endDate);
     }
 
     /**

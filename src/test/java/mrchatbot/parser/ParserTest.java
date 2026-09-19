@@ -18,6 +18,23 @@ public class ParserTest {
     private final Parser parser = new Parser();
 
     @Test
+    public void createTask_eventEndNotAfterStart_exceptionThrown() {
+        String[] inputs = {
+            "event meeting /from 2026-09-21 /to 2026-09-20",
+            "event meeting /from 2026-09-21 /to 2026-09-21",
+            "event meeting /to 2026-09-20 /from 2026-09-21"
+        };
+        for (String input : inputs) {
+            MrChatbotException exception = assertThrows(
+                    MrChatbotException.class, () -> parser.createTask(input), input);
+
+            assertEquals("Event end date must be after its start date. "
+                    + "Please use the format: event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>",
+                    exception.getMessage());
+        }
+    }
+
+    @Test
     public void parseCommand_listCommand_listCommandReturned() throws MrChatbotException {
         Command command = parser.parseCommand("list");
 

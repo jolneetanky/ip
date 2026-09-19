@@ -9,11 +9,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import mrchatbot.ui.ProfileAvatar;
 
 /**
  * Provides the JavaFX graphical user interface for Mr Chatbot.
@@ -26,10 +28,14 @@ public class Main extends Application {
     private static final String DEADLINE_TEMPLATE = "deadline <description> /by <yyyy-mm-dd>";
     private static final String EVENT_TEMPLATE = "event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>";
 
+    private static final String RECURRING_DAILY_TEMPLATE = "recurring <description> /every day";
+    private static final String RECURRING_WEEKLY_TEMPLATE = "recurring <description> /every week";
+
     private MrChatbotEngine engine;
     private VBox dialogContainer;
     private TextField userInput;
     private Label inputSuggestion;
+    private Label recurringGuidance;
 
     /**
      * Builds and shows the chatbot window.
@@ -76,13 +82,18 @@ public class Main extends Application {
         sendButton.setDefaultButton(true);
         sendButton.setOnAction(event -> handleUserInput());
 
-        HBox suggestionBar = createSuggestionBar();
+        FlowPane suggestionBar = createSuggestionBar();
+        recurringGuidance = new Label();
+        recurringGuidance.setWrapText(true);
+        recurringGuidance.setStyle("-fx-text-fill: #475569; -fx-padding: 0 12 10 12;");
+        recurringGuidance.setVisible(false);
+        recurringGuidance.setManaged(false);
 
         HBox inputArea = new HBox(8, guidedInput, sendButton);
         inputArea.setPadding(new Insets(12));
         HBox.setHgrow(guidedInput, Priority.ALWAYS);
 
-        VBox inputPanel = new VBox(8, suggestionBar, inputArea);
+        VBox inputPanel = new VBox(8, suggestionBar, inputArea, recurringGuidance);
         inputPanel.setStyle("-fx-background-color: #ffffff; -fx-border-color: #d0d7de; -fx-border-width: 1 0 0 0;");
         return inputPanel;
     }
@@ -110,12 +121,14 @@ public class Main extends Application {
     /**
      * Creates shortcut chips for common command templates.
      */
-    private HBox createSuggestionBar() {
-        HBox suggestionBar = new HBox(8);
+    private FlowPane createSuggestionBar() {
+        FlowPane suggestionBar = new FlowPane(8, 8);
         suggestionBar.setPadding(new Insets(10, 12, 0, 12));
         suggestionBar.getChildren().add(createSuggestionButton("todo", "todo"));
         suggestionBar.getChildren().add(createSuggestionButton("deadline", "deadline"));
         suggestionBar.getChildren().add(createSuggestionButton("event", "event"));
+        suggestionBar.getChildren().add(createSuggestionButton("daily task", RECURRING_DAILY_TEMPLATE));
+        suggestionBar.getChildren().add(createSuggestionButton("recurring task", RECURRING_WEEKLY_TEMPLATE));
         suggestionBar.getChildren().add(createSuggestionButton("list", "list"));
         suggestionBar.getChildren().add(createSuggestionButton("help", "help"));
         return suggestionBar;
@@ -133,7 +146,7 @@ public class Main extends Application {
     }
 
     /**
-     * Applies a command template and puts the caret where the user should start editing.
+     * Applies a command template and selects its first placeholder for replacement.
      */
     private void applySuggestion(String template) {
         userInput.setText(template);
@@ -141,7 +154,8 @@ public class Main extends Application {
         if (placeholderIndex == -1) {
             userInput.positionCaret(template.length());
         } else {
-            userInput.positionCaret(placeholderIndex);
+            int placeholderEnd = template.indexOf('>', placeholderIndex);
+            userInput.selectRange(placeholderIndex, placeholderEnd + 1);
         }
         userInput.requestFocus();
     }
@@ -152,6 +166,11 @@ public class Main extends Application {
     private void updateInputGuidance(String input) {
         String suggestion = commandSuggestion(input);
         inputSuggestion.setText(suggestion);
+        boolean isRecurring = input.stripLeading().toLowerCase().startsWith("recurring");
+        recurringGuidance.setVisible(isRecurring);
+        recurringGuidance.setManaged(isRecurring);
+        recurringGuidance.setText("Repeat daily: /every day. Repeat weekly: /every week. "
+                + "Weekly tasks can add /on monday (or any full weekday); otherwise use today's weekday.");
         if (input.isBlank()) {
             userInput.setPromptText(DEFAULT_PROMPT);
         } else {
@@ -166,6 +185,12 @@ public class Main extends Application {
         String lowerCaseInput = input.toLowerCase();
         if (input.isBlank()) {
             return "";
+        }
+        if (RECURRING_DAILY_TEMPLATE.startsWith(lowerCaseInput)) {
+            return RECURRING_DAILY_TEMPLATE;
+        }
+        if (lowerCaseInput.startsWith("recurring ") && !lowerCaseInput.contains(" /every")) {
+            return appendGuidance(input, "/every day or /every week");
         }
         if (lowerCaseInput.startsWith("deadline") && !lowerCaseInput.contains(" /by ")) {
             return appendGuidance(input, "/by <yyyy-mm-dd>");
@@ -236,20 +261,21 @@ public class Main extends Application {
      * Adds a user message bubble to the chat history.
      */
     private void addUserMessage(String message) {
-        addMessage(message, Pos.CENTER_RIGHT, "#dbeafe");
+        addMessage(message, true);
     }
 
     /**
      * Adds a chatbot message bubble to the chat history.
      */
     private void addBotMessage(String message) {
-        addMessage(message, Pos.CENTER_LEFT, "#ffffff");
+        addMessage(message, false);
     }
 
     /**
      * Adds one styled message bubble to the chat history.
      */
-    private void addMessage(String message, Pos alignment, String backgroundColor) {
+    private void addMessage(String message, boolean isUser) {
+        String backgroundColor = isUser ? "#dbeafe" : "#ffffff";
         Label messageLabel = new Label(message);
         messageLabel.setWrapText(true);
         messageLabel.setMaxWidth(360);
@@ -257,8 +283,9 @@ public class Main extends Application {
                 + "; -fx-background-radius: 8; -fx-padding: 10; -fx-border-color: #d0d7de;"
                 + " -fx-border-radius: 8;");
 
-        HBox messageRow = new HBox(messageLabel);
-        messageRow.setAlignment(alignment);
+        ProfileAvatar avatar = new ProfileAvatar(isUser);
+        HBox messageRow = isUser ? new HBox(10, messageLabel, avatar) : new HBox(10, avatar, messageLabel);
+        messageRow.setAlignment(isUser ? Pos.TOP_RIGHT : Pos.TOP_LEFT);
         dialogContainer.getChildren().add(messageRow);
     }
 }

@@ -1,6 +1,7 @@
 package mrchatbot.task;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import mrchatbot.exception.MrChatbotException;
 
@@ -102,14 +103,9 @@ public class TaskList {
      */
     public ArrayList<Task> find(String keyword) {
         String lowerCaseKeyword = keyword.toLowerCase();
-        ArrayList<Task> matchingTasks = new ArrayList<>();
-
-        for (Task task : tasks) {
-            if (task.getDescription().toLowerCase().contains(lowerCaseKeyword)) {
-                matchingTasks.add(task);
-            }
-        }
-        return matchingTasks;
+        return tasks.stream()
+                .filter(task -> task.getDescription().toLowerCase().contains(lowerCaseKeyword))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**

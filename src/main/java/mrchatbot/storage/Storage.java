@@ -69,10 +69,9 @@ public class Storage {
             if (parentDirectory != null) {
                 Files.createDirectories(parentDirectory);
             }
-            ArrayList<String> taskLines = new ArrayList<>();
-            for (Task task : tasks.asArrayList()) {
-                taskLines.add(toStorageString(task));
-            }
+            List<String> taskLines = tasks.asArrayList().stream()
+                    .map(this::toStorageString)
+                    .toList();
             if (parentDirectory == null) {
                 tempFile = Files.createTempFile("duke", ".tmp");
             } else {
@@ -167,12 +166,7 @@ public class Storage {
      * Returns true if any field that forms a task is empty.
      */
     private boolean hasBlankRequiredField(ArrayList<String> parts) {
-        for (String part : parts) {
-            if (part.isBlank()) {
-                return true;
-            }
-        }
-        return false;
+        return parts.stream().anyMatch(String::isBlank);
     }
 
     /**

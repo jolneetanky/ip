@@ -69,7 +69,7 @@ public class Storage {
             if (parentDirectory != null) {
                 Files.createDirectories(parentDirectory);
             }
-            ArrayList<String> taskLines = formatTaskLines(tasks);
+            List<String> taskLines = formatTaskLines(tasks);
             tempFile = createTemporaryFile(parentDirectory);
             Files.write(tempFile, taskLines);
             Files.move(tempFile, filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -82,12 +82,10 @@ public class Storage {
     /**
      * Formats tasks as individual lines ready to write to disk.
      */
-    private ArrayList<String> formatTaskLines(TaskList tasks) {
-        ArrayList<String> taskLines = new ArrayList<>();
-        for (Task task : tasks.asArrayList()) {
-            taskLines.add(toStorageString(task));
-        }
-        return taskLines;
+    private List<String> formatTaskLines(TaskList tasks) {
+        return tasks.asArrayList().stream()
+                .map(this::toStorageString)
+                .toList();
     }
 
     /**
@@ -189,12 +187,7 @@ public class Storage {
      * Returns true if any field that forms a task is empty.
      */
     private boolean hasBlankRequiredField(ArrayList<String> parts) {
-        for (String part : parts) {
-            if (part.isBlank()) {
-                return true;
-            }
-        }
-        return false;
+        return parts.stream().anyMatch(String::isBlank);
     }
 
     /**

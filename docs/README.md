@@ -6,7 +6,7 @@ Mr Chatbot helps you keep track of things to do, deadlines, events, and daily or
 
 With Java 25 installed, open a terminal in the project folder and run `./gradlew run` (`gradlew.bat run` on Windows). The chat window opens when the build finishes.
 
-Type in the box at the bottom, then press **Enter** or click **Send**. The shortcut buttons help you start a command. **daily task** and **recurring task** insert templates: replace the selected `<description>` with your own text before sending. Type `help` whenever you need a reminder.
+Type in the box at the bottom, then press **Enter** or click **Send**. The shortcut buttons help you start a command. **daily task** and **recurring task** insert templates: replace the selected `<description>` with your own text before sending. Clicking a shortcut fills the input box; it does not add a task until you send the command. For a weekly template, you can append `/on monday` (or another weekday). Type `help` whenever you need a reminder.
 
 ## Add tasks
 

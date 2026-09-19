@@ -17,7 +17,7 @@ import mrchatbot.ui.Ui;
  * Handles chatbot command processing without depending on a specific user interface.
  */
 public class MrChatbotEngine {
-    private static final String SAVE_FILE_PATH = "data/duke.txt";
+    private static final String SAVE_FILE_PATH = "data/mr-chatbot.txt";
 
     private final Clock clock;
     /** Tracks resets that still need saving after a temporary storage failure. */

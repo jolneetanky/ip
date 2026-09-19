@@ -251,6 +251,9 @@ public class Parser {
      * The valueIndex parameter is the starting index of the delimiter.
      */
     private String eventValue(String input, int valueIndex, int delimiterLength, int otherIndex) {
+        // Callers only extract values after finding a complete delimiter in the input.
+        assert valueIndex >= 0 && delimiterLength > 0 && valueIndex <= input.length() - delimiterLength
+                : "Event value extraction requires a complete delimiter";
         int valueStartIndex = valueIndex + delimiterLength;
         int valueEndIndex = otherIndex != -1 && otherIndex > valueIndex ? otherIndex : input.length();
         // handles the edge case where, after adding the delimiter, valueStartIndex exceeds valueEndIndex.
@@ -264,6 +267,9 @@ public class Parser {
      * Creates a message that says which event fields are missing.
      */
     private String eventMissingMessage(boolean isDescriptionMissing, boolean isFromMissing, boolean isToMissing) {
+        // This helper is only used after detecting at least one missing event field.
+        assert isDescriptionMissing || isFromMissing || isToMissing
+                : "A missing-field message requires at least one missing field";
         String missingParts = "";
         if (isDescriptionMissing) {
             missingParts = "description";

@@ -188,6 +188,8 @@ public class Storage {
             return joinFields("E", statusOf(task), event.getDescription(),
                     event.getFrom().toString(), event.getTo().toString());
         }
+        // All other supported task types return above; a new type needs its own storage format.
+        assert task instanceof Todo : "Only Todo tasks may use the fallback storage format";
         return joinFields("T", statusOf(task), task.getDescription());
     }
 

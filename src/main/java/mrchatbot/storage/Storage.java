@@ -69,25 +69,46 @@ public class Storage {
             if (parentDirectory != null) {
                 Files.createDirectories(parentDirectory);
             }
-            List<String> taskLines = tasks.asArrayList().stream()
-                    .map(this::toStorageString)
-                    .toList();
-            if (parentDirectory == null) {
-                tempFile = Files.createTempFile("duke", ".tmp");
-            } else {
-                tempFile = Files.createTempFile(parentDirectory, "duke", ".tmp");
-            }
+            List<String> taskLines = formatTaskLines(tasks);
+            tempFile = createTemporaryFile(parentDirectory);
             Files.write(tempFile, taskLines);
             Files.move(tempFile, filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            if (tempFile != null) {
-                try {
-                    Files.deleteIfExists(tempFile);
-                } catch (IOException ignored) {
-                    // The original save failure is the useful error for the user.
-                }
-            }
+            deleteTemporaryFile(tempFile);
             throw new MrChatbotException(SAVE_ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Formats tasks as individual lines ready to write to disk.
+     */
+    private List<String> formatTaskLines(TaskList tasks) {
+        return tasks.asArrayList().stream()
+                .map(this::toStorageString)
+                .toList();
+    }
+
+    /**
+     * Creates a temporary save file beside the destination, or in the default temporary directory.
+     */
+    private Path createTemporaryFile(Path parentDirectory) throws IOException {
+        if (parentDirectory == null) {
+            return Files.createTempFile("duke", ".tmp");
+        }
+        return Files.createTempFile(parentDirectory, "duke", ".tmp");
+    }
+
+    /**
+     * Attempts to remove a failed save's temporary file without hiding the original failure.
+     */
+    private void deleteTemporaryFile(Path tempFile) {
+        if (tempFile == null) {
+            return;
+        }
+        try {
+            Files.deleteIfExists(tempFile);
+        } catch (IOException ignored) {
+            // The original save failure is the useful error for the user.
         }
     }
 
@@ -182,6 +203,8 @@ public class Storage {
             return joinFields("E", statusOf(task), event.getDescription(),
                     event.getFrom().toString(), event.getTo().toString());
         }
+        // All other supported task types return above; a new type needs its own storage format.
+        assert task instanceof Todo : "Only Todo tasks may use the fallback storage format";
         return joinFields("T", statusOf(task), task.getDescription());
     }
 

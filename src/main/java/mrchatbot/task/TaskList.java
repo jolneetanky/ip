@@ -88,6 +88,8 @@ public class TaskList {
      * Returns the task at the given zero-based index for display.
      */
     public Task get(int index) {
+        // Display loops generate zero-based indices bounded by size(), rather than user task numbers.
+        assert index >= 0 && index < tasks.size() : "Display index must refer to an existing task";
         return tasks.get(index);
     }
 

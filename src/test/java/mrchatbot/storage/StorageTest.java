@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -22,6 +23,23 @@ import mrchatbot.task.Todo;
 public class StorageTest {
     @TempDir
     private Path tempDir;
+
+    @Test
+    public void saveTasks_destinationIsNonemptyDirectory_cleansUpTemporaryFile() throws Exception {
+        Path destination = Files.createDirectory(tempDir.resolve("duke.txt"));
+        Path existingFile = destination.resolve("keep.txt");
+        Files.writeString(existingFile, "existing contents");
+        Storage storage = new Storage(destination.toString());
+
+        MrChatbotException exception = assertThrows(
+                MrChatbotException.class, () -> storage.saveTasks(new TaskList(new Todo("read book"))));
+
+        assertEquals("Sorry, I could not save your tasks.", exception.getMessage());
+        assertEquals("existing contents", Files.readString(existingFile));
+        try (Stream<Path> remainingFiles = Files.list(tempDir)) {
+            assertEquals(1, remainingFiles.count());
+        }
+    }
 
     @Test
     public void saveTasks_taskWithSpecialCharacters_escapesSpecialCharacters() throws Exception {

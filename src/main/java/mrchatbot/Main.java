@@ -30,13 +30,32 @@ public class Main extends Application {
     private VBox dialogContainer;
     private TextField userInput;
     private Label inputSuggestion;
-    private Button sendButton;
 
     /**
      * Builds and shows the chatbot window.
      */
     @Override
     public void start(Stage stage) {
+        ScrollPane scrollPane = createDialogPane();
+        VBox inputPanel = createInputPanel();
+
+        VBox root = new VBox(scrollPane, inputPanel);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+        root.setStyle("-fx-font-family: Arial; -fx-background-color: #f5f7fb;");
+
+        initialiseEngine();
+        addBotMessage("Hello! I'm Mr Chatbot, your personal companion.\nWhat can I do for you, Mr User?");
+
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        stage.setTitle("Mr Chatbot");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    /**
+     * Creates the scrolling chat history and keeps the newest message visible.
+     */
+    private ScrollPane createDialogPane() {
         dialogContainer = new VBox(12);
         dialogContainer.setPadding(new Insets(16));
 
@@ -45,7 +64,33 @@ public class Main extends Application {
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+        return scrollPane;
+    }
 
+    /**
+     * Creates the command input panel with shortcut buttons and a send action.
+     */
+    private VBox createInputPanel() {
+        StackPane guidedInput = createGuidedInput();
+        Button sendButton = new Button("Send");
+        sendButton.setDefaultButton(true);
+        sendButton.setOnAction(event -> handleUserInput());
+
+        HBox suggestionBar = createSuggestionBar();
+
+        HBox inputArea = new HBox(8, guidedInput, sendButton);
+        inputArea.setPadding(new Insets(12));
+        HBox.setHgrow(guidedInput, Priority.ALWAYS);
+
+        VBox inputPanel = new VBox(8, suggestionBar, inputArea);
+        inputPanel.setStyle("-fx-background-color: #ffffff; -fx-border-color: #d0d7de; -fx-border-width: 1 0 0 0;");
+        return inputPanel;
+    }
+
+    /**
+     * Creates the text input and its command-syntax hint overlay.
+     */
+    private StackPane createGuidedInput() {
         userInput = new TextField();
         userInput.setPromptText(DEFAULT_PROMPT);
         userInput.setOnAction(event -> handleUserInput());
@@ -59,31 +104,7 @@ public class Main extends Application {
 
         StackPane guidedInput = new StackPane(inputSuggestion, userInput);
         guidedInput.setAlignment(Pos.CENTER_LEFT);
-
-        sendButton = new Button("Send");
-        sendButton.setDefaultButton(true);
-        sendButton.setOnAction(event -> handleUserInput());
-
-        HBox suggestionBar = createSuggestionBar();
-
-        HBox inputArea = new HBox(8, guidedInput, sendButton);
-        inputArea.setPadding(new Insets(12));
-        HBox.setHgrow(guidedInput, Priority.ALWAYS);
-
-        VBox inputPanel = new VBox(8, suggestionBar, inputArea);
-        inputPanel.setStyle("-fx-background-color: #ffffff; -fx-border-color: #d0d7de; -fx-border-width: 1 0 0 0;");
-
-        VBox root = new VBox(scrollPane, inputPanel);
-        VBox.setVgrow(scrollPane, Priority.ALWAYS);
-        root.setStyle("-fx-font-family: Arial; -fx-background-color: #f5f7fb;");
-
-        initialiseEngine();
-        addBotMessage("Hello! I'm Mr Chatbot, your personal companion.\nWhat can I do for you, Mr User?");
-
-        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-        stage.setTitle("Mr Chatbot");
-        stage.setScene(scene);
-        stage.show();
+        return guidedInput;
     }
 
     /**
